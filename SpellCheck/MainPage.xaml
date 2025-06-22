@@ -3,9 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SpellCheck.MainPage">
 
-    <Grid
-        x:Name="viewGrid">
-        
-    </Grid>
+
 
 </ContentPage>
