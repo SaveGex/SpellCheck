@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpellCheck", "SpellCheck\SpellCheck.csproj", "{3F641B96-FCC8-4017-909E-FE968BCA7932}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LargeFileStorage", "LargeFileStorage\LargeFileStorage.csproj", "{94609252-B80A-4AC7-8BB9-84E9C211C596}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,8 +19,15 @@ Global
 		{3F641B96-FCC8-4017-909E-FE968BCA7932}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F641B96-FCC8-4017-909E-FE968BCA7932}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3F641B96-FCC8-4017-909E-FE968BCA7932}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{94609252-B80A-4AC7-8BB9-84E9C211C596}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94609252-B80A-4AC7-8BB9-84E9C211C596}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94609252-B80A-4AC7-8BB9-84E9C211C596}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94609252-B80A-4AC7-8BB9-84E9C211C596}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94A79AB7-B04A-4A37-A0F2-82096498757F}
 	EndGlobalSection
 EndGlobal
