@@ -7,13 +7,7 @@ public partial class Question
 {
     public int Id { get; set; }
 
-    public int ModuleId { get; set; }
+    public string Expression { get; set; } = null!;
 
-    public string Question1 { get; set; } = null!;
-
-    public string Answer { get; set; } = null!;
-
-    public virtual Module Module { get; set; } = null!;
-
-    public virtual ICollection<QuestionImage> QuestionImages { get; set; } = new List<QuestionImage>();
+    public string CorrectVariant { get; set; } = null!;
 }

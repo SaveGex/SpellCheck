@@ -15,5 +15,11 @@ public partial class User
 
     public string? Email { get; set; }
 
-    public virtual ICollection<Module> Modules { get; set; } = new List<Module>();
+    public DateTime CreatedAt { get; set; }
+
+    public virtual ICollection<Friend> FriendFromIndividuals { get; set; } = new List<Friend>();
+
+    public virtual ICollection<Friend> FriendToIndividuals { get; set; } = new List<Friend>();
+
+    public virtual ICollection<WordsToLearn> WordsToLearns { get; set; } = new List<WordsToLearn>();
 }

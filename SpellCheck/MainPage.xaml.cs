@@ -6,7 +6,7 @@ namespace SpellCheck
         public MainPage()
         {
             InitializeComponent();
-        }   
+        }
     }
 
 }
