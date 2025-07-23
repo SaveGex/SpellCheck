@@ -1,13 +1,23 @@
 USE [spell_test_db]
 
+
 CREATE TABLE Users(
 	Id int PRIMARY KEY IDENTITY(1,1),
 	Username nvarchar(32) NOT NULL,
 	Password nvarchar(256) NOT NULL,
-	Number nvarchar(25) UNIQUE NULL,
-	Email nvarchar(254) UNIQUE NULL,
+	Number nvarchar(25) NULL,
+	Email nvarchar(254) NULL,
 	Created_At smalldatetime NOT NULL DEFAULT(GETDATE())
 );
+
+CREATE UNIQUE INDEX IX_Users_Number_NotNull
+ON Users(Number)
+WHERE Number IS NOT NULL;
+
+CREATE UNIQUE INDEX IX_Users_Email_NotNull
+ON Users(Email)
+WHERE Email IS NOT NULL;
+
 
 CREATE TABLE Difficulty_Level(
 	Id int PRIMARY KEY IDENTITY(1,1),

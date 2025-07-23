@@ -1,6 +1,32 @@
-@DbManagerApi_HostAddress = http://localhost:5243
+@DbManagerApi_HostAddress = https://localhost:7268
 
-GET {{DbManagerApi_HostAddress}}/weatherforecast/
-Accept: application/json
+
+
+GET {{DbManagerApi_HostAddress}}/users
 
 ###
+
+@entity_name=Questions
+@id=1
+GET {{DbManagerApi_HostAddress}}/{{entity_name}}
+
+###
+
+POST {{DbManagerApi_HostAddress}}/questions
+{
+
+  "Expression" : "How named a tense which one is used for describing facts or regular actions?",
+  "CorrectVariant" : "Present Simple"
+}
+
+###
+
+POST {{DbManagerApi_HostAddress}}/users
+{
+
+  "Username" : "First user",
+  "Password" : "1234"
+}
+###
+
+

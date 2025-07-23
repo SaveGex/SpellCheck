@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DbManager.Models;
+namespace DbManagerApi.Models;
 
 public partial class WordsToLearn
 {

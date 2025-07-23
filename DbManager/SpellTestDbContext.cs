@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using DbManager.Models;
+using DbManagerApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using File = DbManager.Models.File;
+using File = DbManagerApi.Models.File;
 namespace DbManager;
 
 public partial class SpellTestDbContext : DbContext
@@ -33,17 +33,16 @@ public partial class SpellTestDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        configurationBuilder.AddJsonFile("Configuration\\appsettings.json", optional: false, reloadOnChange: true);            
         _configuration = configurationBuilder.Build();
+        string ? connectionString = _configuration.GetConnectionString("DefaultConnection");
         optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"));
     }
-        
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<DifficultyLevel>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Difficul__3214EC07BB4B78A0");
+            entity.HasKey(e => e.Id).HasName("PK__Difficul__3214EC074AE865BB");
 
             entity.ToTable("Difficulty_Level");
 
@@ -52,7 +51,7 @@ public partial class SpellTestDbContext : DbContext
 
         modelBuilder.Entity<File>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Files__3214EC0720225BD0");
+            entity.HasKey(e => e.Id).HasName("PK__Files__3214EC07317E1D97");
 
             entity.Property(e => e.EntityType).HasMaxLength(50);
             entity.Property(e => e.UploadedAt)
@@ -62,7 +61,7 @@ public partial class SpellTestDbContext : DbContext
 
         modelBuilder.Entity<Friend>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Friends__3214EC079A2A8020");
+            entity.HasKey(e => e.Id).HasName("PK__Friends__3214EC0752A383C3");
 
             entity.HasIndex(e => new { e.FromIndividualId, e.ToIndividualId }, "UQ_from_individual_to_individual_ids").IsUnique();
 
@@ -82,7 +81,7 @@ public partial class SpellTestDbContext : DbContext
 
         modelBuilder.Entity<Question>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Question__3214EC07D48F812E");
+            entity.HasKey(e => e.Id).HasName("PK__Question__3214EC072C7CC15F");
 
             entity.Property(e => e.CorrectVariant)
                 .HasMaxLength(1024)
@@ -92,11 +91,15 @@ public partial class SpellTestDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC070A3F4FB3");
+            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC0786ED21B9");
 
-            entity.HasIndex(e => e.Number, "UQ__Users__78A1A19D82189C43").IsUnique();
+            entity.HasIndex(e => e.Email, "IX_Users_Email_NotNull")
+                .IsUnique()
+                .HasFilter("([Email] IS NOT NULL)");
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534A4E6F381").IsUnique();
+            entity.HasIndex(e => e.Number, "IX_Users_Number_NotNull")
+                .IsUnique()
+                .HasFilter("([Number] IS NOT NULL)");
 
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -110,7 +113,7 @@ public partial class SpellTestDbContext : DbContext
 
         modelBuilder.Entity<WordsToLearn>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Words_To__3214EC0717916050");
+            entity.HasKey(e => e.Id).HasName("PK__Words_To__3214EC0785172CBC");
 
             entity.ToTable("Words_To_Learn");
 
