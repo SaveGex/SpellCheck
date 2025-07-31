@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using System.Collections.Generic;
 
-namespace DbManagerApi.Models;
+namespace Infrastructure.Models;
 
 public partial class Friend
 {
@@ -10,8 +11,8 @@ public partial class Friend
     public int FromIndividualId { get; set; }
 
     public int ToIndividualId { get; set; }
-
+    [BindNever]
     public virtual User FromIndividual { get; set; } = null!;
-
+    [BindNever]
     public virtual User ToIndividual { get; set; } = null!;
 }

@@ -27,16 +27,25 @@ CREATE TABLE Difficulty_Level(
 	CONSTRAINT CHK_Difficulty_Range CHECK(Difficulty >= 0 AND Difficulty <=6)
 );
 
-CREATE TABLE Words_To_Learn(
+CREATE TABLE Words(
 	Id int PRIMARY KEY IDENTITY(1,1),
-	Learning_Progress int NOT NULL DEFAULT(0),
-	Expression nvarchar(256) NOT NULL,
-	Meaning nvarchar(256) NOT NULL,
+	User_Id int NOT NULL,
+	Expression nvarchar(256) NOT NULL, --Should be unique
+	Meaning nvarchar(256) NOT NULL,	   --Depend of "Expression"
 	Difficulty int NULL,
+
+	CONSTRAINT FK_Words_Users FOREIGN KEY (User_Id) REFERENCES Users(Id),
+	CONSTRAINT FK_Difficulty_Difficulty_Level FOREIGN KEY (Difficulty) REFERENCES Difficulty_Level(Id)
+);
+
+CREATE TABLE LearnWords(
+	Id int PRIMARY KEY IDENTITY(1,1),
+	Word_Id int NOT NULL,
+	Learning_Progress int NOT NULL DEFAULT(0),
 	User_Id int NOT NULL,
 
-	CONSTRAINT FK_Words_To_Learn_User FOREIGN KEY (User_Id) REFERENCES Users(Id),
-	CONSTRAINT FK_Difficulty_Difficulty_Level FOREIGN KEY (Difficulty) REFERENCES Difficulty_Level(Id)
+	CONSTRAINT FK_Words_To_Learn_Words FOREIGN KEY (Word_Id) REFERENCES Words(Id),
+	CONSTRAINT FK_Words_To_Learn_Users FOREIGN KEY (User_Id) REFERENCES Users(Id)
 );
 
 CREATE TABLE Questions(

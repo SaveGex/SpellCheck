@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using DbManagerApi.Models;
+using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using File = DbManagerApi.Models.File;
-namespace DbManager;
+using File = Infrastructure.Models.File;
+namespace Infrastructure;
 
 public partial class SpellTestDbContext : DbContext
 {
-    IConfiguration _configuration = null!;
+    private IConfiguration _configuration { get; set; } = null!;
     public SpellTestDbContext()
     {
     }
@@ -24,25 +24,28 @@ public partial class SpellTestDbContext : DbContext
 
     public virtual DbSet<Friend> Friends { get; set; }
 
+    public virtual DbSet<LearnWord> LearnWords { get; set; }
+
     public virtual DbSet<Question> Questions { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<WordsToLearn> WordsToLearns { get; set; }
+    public virtual DbSet<Word> Words { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.AddJsonFile("Configuration\\appsettings.json", optional: false, reloadOnChange: true);            
+        configurationBuilder.AddJsonFile("Configuration/appsettings.json", optional: false, reloadOnChange: true);
         _configuration = configurationBuilder.Build();
-        string ? connectionString = _configuration.GetConnectionString("DefaultConnection");
+        string? connectionString = _configuration.GetConnectionString("DefaultConnection");
         optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"));
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<DifficultyLevel>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Difficul__3214EC074AE865BB");
+            entity.HasKey(e => e.Id).HasName("PK__Difficul__3214EC07FF2BA349");
 
             entity.ToTable("Difficulty_Level");
 
@@ -51,7 +54,7 @@ public partial class SpellTestDbContext : DbContext
 
         modelBuilder.Entity<File>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Files__3214EC07317E1D97");
+            entity.HasKey(e => e.Id).HasName("PK__Files__3214EC074CDC728B");
 
             entity.Property(e => e.EntityType).HasMaxLength(50);
             entity.Property(e => e.UploadedAt)
@@ -61,7 +64,7 @@ public partial class SpellTestDbContext : DbContext
 
         modelBuilder.Entity<Friend>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Friends__3214EC0752A383C3");
+            entity.HasKey(e => e.Id).HasName("PK__Friends__3214EC077DB8FA86");
 
             entity.HasIndex(e => new { e.FromIndividualId, e.ToIndividualId }, "UQ_from_individual_to_individual_ids").IsUnique();
 
@@ -79,9 +82,28 @@ public partial class SpellTestDbContext : DbContext
                 .HasConstraintName("FK_to_individual_Friend_id_Users");
         });
 
+        modelBuilder.Entity<LearnWord>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__LearnWor__3214EC0721842631");
+
+            entity.Property(e => e.LearningProgress).HasColumnName("Learning_Progress");
+            entity.Property(e => e.UserId).HasColumnName("User_Id");
+            entity.Property(e => e.WordId).HasColumnName("Word_Id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.LearnWords)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Words_To_Learn_Users");
+
+            entity.HasOne(d => d.Word).WithMany(p => p.LearnWords)
+                .HasForeignKey(d => d.WordId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Words_To_Learn_Words");
+        });
+
         modelBuilder.Entity<Question>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Question__3214EC072C7CC15F");
+            entity.HasKey(e => e.Id).HasName("PK__Question__3214EC0737DDD589");
 
             entity.Property(e => e.CorrectVariant)
                 .HasMaxLength(1024)
@@ -91,7 +113,7 @@ public partial class SpellTestDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC0786ED21B9");
+            entity.HasKey(e => e.Id).HasName("PK__Users__3214EC078429AE7B");
 
             entity.HasIndex(e => e.Email, "IX_Users_Email_NotNull")
                 .IsUnique()
@@ -111,25 +133,22 @@ public partial class SpellTestDbContext : DbContext
             entity.Property(e => e.Username).HasMaxLength(32);
         });
 
-        modelBuilder.Entity<WordsToLearn>(entity =>
+        modelBuilder.Entity<Word>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Words_To__3214EC0785172CBC");
-
-            entity.ToTable("Words_To_Learn");
+            entity.HasKey(e => e.Id).HasName("PK__Words__3214EC07AD7BC8BA");
 
             entity.Property(e => e.Expression).HasMaxLength(256);
-            entity.Property(e => e.LearningProgress).HasColumnName("Learning_Progress");
             entity.Property(e => e.Meaning).HasMaxLength(256);
             entity.Property(e => e.UserId).HasColumnName("User_Id");
 
-            entity.HasOne(d => d.DifficultyNavigation).WithMany(p => p.WordsToLearns)
+            entity.HasOne(d => d.DifficultyNavigation).WithMany(p => p.Words)
                 .HasForeignKey(d => d.Difficulty)
                 .HasConstraintName("FK_Difficulty_Difficulty_Level");
 
-            entity.HasOne(d => d.User).WithMany(p => p.WordsToLearns)
+            entity.HasOne(d => d.User).WithMany(p => p.Words)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Words_To_Learn_User");
+                .HasConstraintName("FK_Words_Users");
         });
 
         OnModelCreatingPartial(modelBuilder);

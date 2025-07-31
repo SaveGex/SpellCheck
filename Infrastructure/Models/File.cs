@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DbManagerApi.Models;
+namespace Infrastructure.Models;
 
 public partial class File
 {

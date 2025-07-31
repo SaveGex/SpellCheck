@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using System.Collections.Generic;
 
-namespace DbManagerApi.Models;
+namespace Infrastructure.Models;
 
 public partial class DifficultyLevel
 {
@@ -10,6 +11,6 @@ public partial class DifficultyLevel
     public string Name { get; set; } = null!;
 
     public int? Difficulty { get; set; }
-
-    public virtual ICollection<WordsToLearn> WordsToLearns { get; set; } = new List<WordsToLearn>();
+    [BindNever]
+    public virtual ICollection<Word> Words { get; set; } = new List<Word>();
 }

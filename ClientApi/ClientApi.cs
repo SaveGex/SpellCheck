@@ -1,6 +1,6 @@
-﻿namespace ApiActions;
+﻿namespace ClientApi;
 
-public class ApiClient
+public class ClientApi
 {
     private HttpClient _httpClient;
     //ToDo: Create mechanism of interaction with the Api
