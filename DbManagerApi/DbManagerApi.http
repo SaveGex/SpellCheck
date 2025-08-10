@@ -1,8 +1,27 @@
-@DbManagerApi_HostAddress = http://localhost:5078
+@DbManagerApi_HostAddress = https://localhost:7284
 
 GET {{DbManagerApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
 
+POST {{DbManagerApi_HostAddress}}/api/Users
+Content-Type: application/json
+{
+  "Username" : "Opsik",
+  "Password" : "1234",
+  "Number" : "+48123123123"
+  
+}
 
+###
+
+GET {{DbManagerApi_HostAddress}}/api/Users
+Authorization: Basic KzQ4MTIzMTIzMTIzOjEyMzQ=
+
+###
+
+DELETE {{DbManagerApi_HostAddress}}/api/users/1
+Authorization: Basic KzQ4MTIzMTIzMTIzOjEyMzQ=
+
+###

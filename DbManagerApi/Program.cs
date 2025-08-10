@@ -1,5 +1,7 @@
+using DbManagerApi.Authentication.Handlers;
 using DbManagerApi.JsonPatchSample;
 using Infrastructure;
+using Microsoft.AspNetCore.Authentication;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,11 +16,12 @@ builder.Services.AddControllers()
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<SpellTestDbContext>();
 
+builder.Services.AddAuthentication("BasicAuthentication")
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
 var app = builder.Build();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
