@@ -4,6 +4,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(SpellTestDbContext))]
-    partial class SpellTestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250824131220_Change module interact between other pieces of app")]
+    partial class Changemoduleinteractbetweenotherpiecesofapp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,11 +128,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("(newid())");
 
-                    b.Property<string>("IdentifierName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
-                        .HasColumnName("Identifier_Name");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(256)
@@ -140,10 +138,6 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex(new[] { "Identifier" }, "IX_Modules_Identifier")
                         .IsUnique();
-
-                    b.HasIndex(new[] { "IdentifierName" }, "IX_Modules_Identifier_Name_NotNull")
-                        .IsUnique()
-                        .HasFilter("([Identifier_Name] IS NOT NULL)");
 
                     b.HasIndex(new[] { "AuthorId" }, "IX_Modules_User_Id");
 

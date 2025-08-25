@@ -85,14 +85,39 @@ public partial class SpellTestDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Modules__3214EC079E5E094A");
 
-            entity.HasIndex(e => e.UserId, "IX_Modules_User_Id");
+            entity.HasIndex(e => e.IdentifierName, "IX_Modules_Identifier_Name_NotNull")
+                .IsUnique()
+                .HasFilter("([Identifier_Name] IS NOT NULL)");
 
-            entity.Property(e => e.UserId).HasColumnName("User_Id");
+            entity.Property(e => e.AuthorId).HasColumnName("User_Id");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Modules)
-                .HasForeignKey(d => d.UserId)
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(256);
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Created_At");
+
+            entity.Property(e => e.Identifier)
+                .HasDefaultValueSql("(newid())")
+                .IsRequired()
+                .HasMaxLength(256);
+
+            entity.Property(e => e.IdentifierName)
+                .HasMaxLength(256)
+                .HasColumnName("Identifier_Name");
+
+            entity.HasOne(d => d.Author).WithMany(p => p.CreatedModules)
+                .HasForeignKey(d => d.AuthorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Modules_Users");
+
+            entity.HasIndex(e => e.AuthorId, "IX_Modules_User_Id");
+
+            entity.HasIndex(e => e.Identifier, "IX_Modules_Identifier")
+                .IsUnique();
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -114,9 +139,9 @@ public partial class SpellTestDbContext : DbContext
         });
 
         modelBuilder.Entity<Role>().HasData(
-            new Role { Id = 1, Name = "Admin" },
-            new Role { Id = 2, Name = "Moderator" },
-            new Role { Id = 3, Name = "User" }
+            new Role { Id = 1, Name = RoleNames.Admin },
+            new Role { Id = 2, Name = RoleNames.Manager },
+            new Role { Id = 3, Name = RoleNames.User }
         );
 
         modelBuilder.Entity<User>(entity =>
@@ -143,6 +168,9 @@ public partial class SpellTestDbContext : DbContext
             entity.HasMany(u => u.Roles)
                 .WithMany(r => r.Users);
 
+            entity.HasMany(u => u.UserModules)
+                .WithMany(m => m.Users);
+
             entity.Property(e => e.Email).HasMaxLength(254);
             entity.Property(e => e.Number).HasMaxLength(25);
             entity.Property(e => e.Password).HasMaxLength(256);
@@ -160,10 +188,10 @@ public partial class SpellTestDbContext : DbContext
             entity.Property(e => e.Expression).HasMaxLength(256);
             entity.Property(e => e.Meaning).HasMaxLength(256);
             entity.Property(e => e.ModuleId).HasColumnName("Module_Id");
-            entity.Property(e => e.UserId).HasColumnName("User_Id");
+            entity.Property(e => e.AuthorId).HasColumnName("Author_Id");
 
             entity.HasOne(d => d.DifficultyNavigation).WithMany(p => p.Words)
-                .HasForeignKey(d => d.Difficulty)
+                .HasForeignKey(d => d.DifficultyId)
                 .HasConstraintName("FK_Difficulty_Difficulty_Level");
 
             entity.HasOne(d => d.Module).WithMany(p => p.Words)
@@ -172,7 +200,7 @@ public partial class SpellTestDbContext : DbContext
                 .HasConstraintName("FK_Words_Modules");
 
             entity.HasOne(d => d.User).WithMany(p => p.Words)
-                .HasForeignKey(d => d.UserId)
+                .HasForeignKey(d => d.AuthorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Words_Users");
         });

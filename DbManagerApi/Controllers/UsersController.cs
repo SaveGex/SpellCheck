@@ -1,4 +1,5 @@
-﻿using DbManagerApi.Services;
+﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
+using DbManagerApi.Services;
 using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
@@ -6,13 +7,13 @@ using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 
 namespace DbManagerApi.Controllers;
 
+[ApiController]
+[Authorize(Roles = $"{RoleNames.Admin}, {RoleNames.Manager}")]
 [Route("api/[controller]")]
-[Authorize(Roles = RoleNames.User)]
-public class UsersController : Controller
+public class UsersController : ControllerBase
 {
     private IUserService UserService { get; set; }
     public UsersController(SpellTestDbContext dbContext)
@@ -58,6 +59,7 @@ public class UsersController : Controller
     }
 
     [HttpPut("{userId:int}")]
+    [UserOwnership("userId", "Users")]
     public async Task<IActionResult> UpdateUserById(int userId, [FromBody]UserUpdateDTO dto)
     {
         Result<UserResponseDTO> result = await UserService.UpdateUserAsync(dto, userId);
@@ -69,23 +71,15 @@ public class UsersController : Controller
     }
 
     [HttpDelete("{userId:int}")]
+    [UserOwnership("userId", "Users")]
     public async Task<IActionResult> DeleteUserById(int userId)
     {
-        Result result = await UserService.DeleteUserAsync(userId);
+        Result<UserResponseDTO> result = await UserService.DeleteUserAsync(userId);
         if (result.IsSuccess)
         {
             return Ok();
         }
 
         return BadRequest(result.Errors);
-    }
-
-    //[Authorize(Roles = RoleNames.User)]
-    [AllowAnonymous]
-    [HttpGet("role/{userId:int}")]
-    public async Task<IActionResult> GetUserRoleById(int userId, SpellTestDbContext db)
-    {
-        var user = await db.Users.FindAsync(userId);
-        return Ok(user?.Roles);
     }
 }

@@ -44,7 +44,7 @@ public class UserService : IUserService
             return Result.Fail("You must provide either Number or Email.");
 
         bool exists = await _context.Users
-            .AnyAsync(u => u.Number == dto.Number || u.Email == dto.Email);
+            .AnyAsync(u => (dto.Number != null ? u.Number == dto.Number : false) || (dto.Email != null ? u.Email == dto.Email : false));
 
         if (exists)
             return Result.Fail("User already exists.");
@@ -68,7 +68,7 @@ public class UserService : IUserService
     /// </summary>
     /// <param name="userId">user id</param>
     /// <returns>Result that represents operation state</returns>
-    public async Task<Result> DeleteUserAsync(int userId)
+    public async Task<Result<UserResponseDTO>> DeleteUserAsync(int userId)
     {
         User? user = await _context.Users.FindAsync(userId);
 
@@ -81,7 +81,7 @@ public class UserService : IUserService
         _context.Entry(user).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
-        return Result.Ok();
+        return Result.Ok(MapToDTO(user));
     }
 
     /// <summary>

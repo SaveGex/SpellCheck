@@ -1,13 +1,9 @@
 ﻿using Infrastructure.Attributes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Models.ModelsDTO
 {
+
     public class UserResponseDTO
     {
         public int Id { get; set; }
@@ -38,10 +34,13 @@ namespace Infrastructure.Models.ModelsDTO
         [StringLength(maximumLength: 254, ErrorMessage = "Email cannot be longer than 254 characters.")]
         public string? Email { get; set; }
     }
+
     [RequireNumberOrEmail]
     public class UserUpdateDTO
     {
+        [Required(ErrorMessage = "Username is required.")]
         public string Username { get; set; } = null!;
+        [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; } = null!;
         public string? Number { get; set; }
         public string? Email { get; set; }

@@ -1,23 +1,26 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Infrastructure.Models;
 
+[PrimaryKey("Id")]
 public partial class Word
 {
     public int Id { get; set; }
-
-    public int UserId { get; set; }
-
+    [Required(ErrorMessage = "Word cannot be made by itself")]
+    public int AuthorId { get; set; }
+    [Required(ErrorMessage = "You cannot create a word beyond the module.")]
     public int ModuleId { get; set; }
     [StringLength(maximumLength: 256, ErrorMessage = "Expression cannot be longer than 256 characters.")]
     public string Expression { get; set; } = null!;
     [StringLength(maximumLength: 256, ErrorMessage = "Meaning cannot be longer than 256 characters.")]
     public string Meaning { get; set; } = null!;
 
-    public int? Difficulty { get; set; }
-
+    public int? DifficultyId { get; set; }
+    [DataType(DataType.DateTime)]
     public DateTime CreatedAt { get; set; }
 
     public virtual DifficultyLevel? DifficultyNavigation { get; set; }
@@ -25,4 +28,21 @@ public partial class Word
     public virtual Module Module { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
+
+    public override bool Equals(object? obj)
+    {
+        if(obj is not Word word)
+        {
+            return false;
+        }
+
+        return ModuleId == word.ModuleId &&
+               string.Equals(Expression, word.Expression, StringComparison.OrdinalIgnoreCase) &&
+               string.Equals(Meaning, word.Meaning, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id, AuthorId, ModuleId, Expression, Meaning, DifficultyId, CreatedAt);
+    }
 }

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Infrastructure.Attributes;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Infrastructure.Models;
 
-public partial class User
+[RequireNumberOrEmail]
+public partial class User 
 {
     public int Id { get; set; }
     [StringLength(maximumLength: 32, ErrorMessage = "Username cannot be longer than 32 characters.")]
@@ -16,7 +15,7 @@ public partial class User
     public string? Number { get; set; }
     [StringLength(maximumLength: 254, ErrorMessage = "Email cannot be longer than 254 characters.")]
     public string? Email { get; set; }
-
+    
     [DataType(DataType.DateTime)]
     public DateTime CreatedAt { get; set; }
     [DataType(DataType.DateTime)]
@@ -26,7 +25,9 @@ public partial class User
 
     public virtual ICollection<Friend> FriendToIndividuals { get; set; } = new List<Friend>();
 
-    public virtual ICollection<Module> Modules { get; set; } = new List<Module>();
+    public virtual ICollection<Module> CreatedModules { get; set; } = new List<Module>();
+    
+    public virtual ICollection<Module> UserModules { get; set; } = new List<Module>();
 
     public virtual ICollection<Word> Words { get; set; } = new List<Word>();
     
