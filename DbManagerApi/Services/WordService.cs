@@ -36,7 +36,6 @@ public class WordService : IWordService
     
     public async Task<Result<WordResponseDTO>> CreateWordAsync(WordCreateDTO dto)
     {
-        //if(dto.AuthorId != )
         Word word = new Word()
         {
             AuthorId = dto.AuthorId,

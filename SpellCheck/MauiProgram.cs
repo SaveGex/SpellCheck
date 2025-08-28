@@ -16,7 +16,6 @@ namespace SpellCheck
                 });
 
 
-            //builder.Services.AddHttpClient();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

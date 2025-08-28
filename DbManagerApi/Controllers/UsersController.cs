@@ -34,17 +34,20 @@ public class UsersController : ControllerBase
         return BadRequest(result.Errors);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAllUsers()
+    [HttpGet("users")]
+    public async Task<IActionResult> GetAllUsers(
+        [FromQuery] string? propName,
+        [FromQuery] int? limit,
+        [FromQuery] int? userId,
+        [FromQuery] bool? reverse)
     {
-        Result<IEnumerable<UserResponseDTO>> result = await UserService.GetAllUsersAsync();
+        var result = await UserService.GetUserSequenceAsync(propName, limit, userId, reverse);
         if (result.IsSuccess)
-        {
             return Ok(result.Value);
-        }
 
         return BadRequest(result.Errors);
     }
+
 
     [HttpGet("{userId:int}")]
     public async Task<IActionResult> GetUserById(int userId)

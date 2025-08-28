@@ -1,4 +1,5 @@
 ﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
+using DbManagerApi.Services.Extentions;
 using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
@@ -6,8 +7,11 @@ using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
 using Microsoft.EntityFrameworkCore;
 using System.Dynamic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using PropertyInfo = System.Reflection.PropertyInfo;
+using Module = Infrastructure.Models.Module;
 
 namespace DbManagerApi.Services;
 
@@ -21,7 +25,7 @@ public class ModuleService : IModuleService
         _context = context;
     }
 
-    public static ModuleResponseDTO MapToDTO(Module module)
+    public static ModuleResponseDTO MapToDTO(Module module, int? wordsNumber = 0)
     {
         return new ModuleResponseDTO
         {
@@ -31,7 +35,10 @@ public class ModuleService : IModuleService
             Name = module.Name,
             AuthorId = module.AuthorId,
             CreatedAt = module.CreatedAt,
-            Words = module.Words.Select(w => WordService.MapToDTO(w)).ToList()
+            Words = module.Words.OrderBy(w => w.CreatedAt)
+                            .Take(wordsNumber ?? 0)
+                            .Select(w => WordService.MapToDTO(w))
+                            .AsCollection()
         };
     }
 
@@ -40,23 +47,17 @@ public class ModuleService : IModuleService
         Module module = new Module();
         _context.Entry(module).CurrentValues.SetValues(dto);
 
-        // Параметр для Lambda (module => ...)
         ParameterExpression moduleParam = Expression.Parameter(typeof(Module), "module");
 
-        // Доступ до властивості module.Identifier
         MemberExpression moduleIdentifier = Expression.Property(moduleParam, nameof(Module.Identifier));
 
-        // Константа dto.Identifier
         ConstantExpression dtoIdentifier = Expression.Constant(module.Identifier, typeof(Guid));
 
-        // Вираз module.Identifier == dto.Identifier
         BinaryExpression equalExpression = Expression.Equal(moduleIdentifier, dtoIdentifier);
 
-        // Lambda: module => module.Identifier == dto.Identifier
         Expression<Func<Module, bool>> moduleEqualsPredicateExpression =
             Expression.Lambda<Func<Module, bool>>(equalExpression, moduleParam);
 
-        // Використовуємо в AnyAsync
         if (await _context.Modules.AnyAsync(moduleEqualsPredicateExpression))
         {
             return Result.Fail("Module with the same identifier already exists.");
@@ -100,6 +101,31 @@ public class ModuleService : IModuleService
         }
 
         return Result.Ok(modules.Select(m => MapToDTO(m)).AsEnumerable());
+    }
+
+    public async Task<Result<IEnumerable<ModuleResponseDTO>>> GetModulesSequenceAsync(string? propName, int? limit, int? moduleId, bool? reverse, int? wordsIncludeNumber)
+    {
+        string orderBy = string.IsNullOrWhiteSpace(propName) ? nameof(Module.Id) : propName;
+        int take = Math.Clamp(limit ?? 100, 1, 1000);
+        int startId = moduleId ?? 1;
+        bool descending = reverse ?? false;
+        int wordsNumber = wordsIncludeNumber ?? 0;
+
+        IQueryable<Module> query = _context.Modules
+            .Include(m => m.Words)
+            .AsQueryable()
+            .Where(m => m.Id >= startId);
+
+        query = query.OrderByProperty(orderBy, descending);
+
+        IEnumerable<ModuleResponseDTO> modules = query
+            .Include(m => m.Words)
+            .Take(take)
+            .ToListAsync().Result
+            .Select(m => MapToDTO(m, wordsNumber));
+        
+
+        return Result.Ok(modules);
     }
 
     public async Task<Result<ModuleResponseDTO>> GetModuleByIdAsync(int moduleId)

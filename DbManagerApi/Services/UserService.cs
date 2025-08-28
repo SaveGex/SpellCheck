@@ -22,7 +22,7 @@ public class UserService : IUserService
         {
             Id = user.Id,
             Username = user.Username,
-            Password = user.Password,
+            //Password = user.Password,
             Number = user.Number,
             Email = user.Email,
             CreatedAt = user.CreatedAt,
@@ -91,19 +91,26 @@ public class UserService : IUserService
     /// A <see cref="Result{T}"/> containing an <see cref="IEnumerable{UserResponseDTO}"/> 
     /// if the operation is successful; otherwise, a failure result with error details.
     /// </returns>
-    public async Task<Result<IEnumerable<UserResponseDTO>>> GetAllUsersAsync()
+    public async Task<Result<IEnumerable<UserResponseDTO>>> GetUserSequenceAsync(string? propName, int? limit, int? userId, bool? reverse)
     {
-        if (!_context.Users.Any())
-        {
-            return Result.Fail(
-                new Error("Users' table is empty.")
-            );
-        }
+        string orderBy = string.IsNullOrWhiteSpace(propName) ? nameof(User.Id) : propName!;
+        int take = Math.Clamp(limit ?? 100, 1, 1000); 
+        int startId = userId ?? 1;
+        bool descending = reverse ?? false;
 
-        List<UserResponseDTO> users = await _context.Users.Select(u => MapToDTO(u)).ToListAsync();
+        IQueryable<User> query = _context.Users.AsQueryable()
+                    .Where(u => u.Id >= startId);
 
-        return Result.Ok(users.AsEnumerable());
+        query = query.OrderByProperty(orderBy, descending);
+
+        List<UserResponseDTO> items = await query
+            .Take(take)
+            .Select(u => MapToDTO(u))
+            .ToListAsync();
+
+        return Result.Ok(items.AsEnumerable());
     }
+
 
     /// <summary>
     /// Looking for user by specified <paramref name="userId"/>

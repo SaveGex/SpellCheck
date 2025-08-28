@@ -27,10 +27,14 @@ public class ModulesController : ControllerBase
 
 
     [HttpGet]
-    [Description("Enumerable of ModuleResponseDTO's does not contain enumerable of words inside for perfomance optimization")]
-    public async Task<IActionResult> GetAllModules()
+    public async Task<IActionResult> GetAllModules(
+        [FromQuery] string? propName,
+        [FromQuery] int? limit,
+        [FromQuery] int? moduleId,
+        [FromQuery] bool? reverse,
+        [FromQuery] int? wordsIncludeNumber)
     {
-        Result<IEnumerable<ModuleResponseDTO>> result = await ModuleService.GetAllModulesAsync();
+        Result<IEnumerable<ModuleResponseDTO>> result = await ModuleService.GetModulesSequenceAsync(propName, limit, moduleId, reverse, wordsIncludeNumber);
         if (result.IsSuccess)
         {
             return Ok(result.Value);

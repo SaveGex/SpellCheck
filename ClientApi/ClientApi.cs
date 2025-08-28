@@ -2,6 +2,6 @@
 
 public class ClientApi
 {
-    private HttpClient _httpClient;
+    private HttpClient? _httpClient;
     //ToDo: Create mechanism of interaction with the Api
 }
