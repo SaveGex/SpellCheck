@@ -4,17 +4,46 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:SpellCheck"
+    xmlns:views="clr-namespace:SpellCheck.Views"
     Shell.FlyoutBehavior="Disabled"
     Title="SpellCheck">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+
+    <Shell.Resources>
+        <!-- Стиль для всієї панелі вкладок -->
+        <Style TargetType="TabBar">
+            <Setter Property="Shell.TabBarBackgroundColor" Value="CornflowerBlue" />
+            <Setter Property="Shell.TabBarTitleColor" Value="Black" />
+            <Setter Property="Shell.TabBarUnselectedColor" Value="LightGray" />
+        </Style>
+
+        <!-- Стиль для окремої вкладки -->
+        <Style TargetType="ShellContent">
+            <Setter Property="Shell.TitleColor" Value="Green" />
+            <Setter Property="Shell.ForegroundColor" Value="DarkGreen" />
+        </Style>
+    </Shell.Resources>
     <TabBar>
+        
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+        
+        
         <ShellContent
             Title="Modules"
-            ContentTemplate=""/>
+            ContentTemplate="{DataTemplate views:ModulesPage}"
+            Route="ModulesPage"/>
+        
+        
+        <ShellContent
+            Title="Learning"
+            ContentTemplate="{DataTemplate views:LearningPage}"
+            Route="LearningPage">
+        </ShellContent>
+        
     </TabBar>
+    
 
 </Shell>

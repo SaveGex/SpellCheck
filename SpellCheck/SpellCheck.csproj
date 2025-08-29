@@ -69,11 +69,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="ModelViews\" />
 	  <Folder Include="Models\" />
 	  <Folder Include="Repositories\" />
-	  <Folder Include="Services\" />
 	  <Folder Include="Resources\Images\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\LearningPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\LoginPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\ModulesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>
