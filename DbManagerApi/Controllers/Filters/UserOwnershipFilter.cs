@@ -11,12 +11,12 @@ public class UserOwnershipFilter : IAsyncAuthorizationFilter
     private readonly IEntityOwnershipService _ownershipService;
     private readonly string _entityIdKey;
     private readonly string _entityName;
-    
+
     /// <summary>
     /// Specifies that a user ownership of an entity or it's have special permission (admin, manager)
     /// </summary>
     /// <param name="entityIdKey">The key representing a <see cref="int"/> variable from route which is contains Id of an entity</param>
-    /// <param name="entityName">The name in plural of the entity to which the filter applies. <br/>For instance <see cref="User"/> - Users/></param>
+    /// <param name="entityName">The name in plural of the entity to which the filter applies. <br/><b>For instance <see cref="User"/> - Users</b></param>
     public UserOwnershipFilter(IEntityOwnershipService _ownershipService, string entityIdKey, string entityName)
     {
         this._ownershipService = _ownershipService;

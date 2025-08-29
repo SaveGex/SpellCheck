@@ -1,21 +1,18 @@
-﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
-using DbManagerApi.Services.Extentions;
+﻿using DbManagerApi.Services.Extentions;
 using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
 using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
 using Microsoft.EntityFrameworkCore;
-using System.Dynamic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using PropertyInfo = System.Reflection.PropertyInfo;
 using Module = Infrastructure.Models.Module;
+using DbManagerApi.Services.Abstracts;
 
 namespace DbManagerApi.Services;
 
-public class ModuleService : IModuleService
+public class ModuleService : ModuleServiceAbstract
 {
 
     private readonly SpellTestDbContext _context;
@@ -42,9 +39,9 @@ public class ModuleService : IModuleService
         };
     }
 
-    public async Task<Result<ModuleResponseDTO>> CreateModuleAsync(ModuleCreateDTO dto)
+    public override async Task<Result<ModuleResponseDTO>> CreateEntityAsync(ModuleCreateDTO dto)
     {
-        Module module = new Module();
+        Module module = new();
         _context.Entry(module).CurrentValues.SetValues(dto);
 
         ParameterExpression moduleParam = Expression.Parameter(typeof(Module), "module");
@@ -71,7 +68,7 @@ public class ModuleService : IModuleService
         return Result.Ok(MapToDTO(module));
     }
 
-    public async Task<Result<ModuleResponseDTO>> DeleteModuleAsync(int moduleId)
+    public override async Task<Result<ModuleResponseDTO>> DeleteEntityAsync(int moduleId)
     {
         Module? module = await _context.Modules.FindAsync(moduleId);
 
@@ -103,7 +100,7 @@ public class ModuleService : IModuleService
         return Result.Ok(modules.Select(m => MapToDTO(m)).AsEnumerable());
     }
 
-    public async Task<Result<IEnumerable<ModuleResponseDTO>>> GetModulesSequenceAsync(string? propName, int? limit, int? moduleId, bool? reverse, int? wordsIncludeNumber)
+    public override async Task<Result<IEnumerable<ModuleResponseDTO>>> GetEntitiesSequenceAsync(string? propName, int? limit, int? moduleId, bool? reverse, int? wordsIncludeNumber)
     {
         string orderBy = string.IsNullOrWhiteSpace(propName) ? nameof(Module.Id) : propName;
         int take = Math.Clamp(limit ?? 100, 1, 1000);
@@ -118,17 +115,18 @@ public class ModuleService : IModuleService
 
         query = query.OrderByProperty(orderBy, descending);
 
-        IEnumerable<ModuleResponseDTO> modules = query
-            .Include(m => m.Words)
-            .Take(take)
-            .ToListAsync().Result
-            .Select(m => MapToDTO(m, wordsNumber));
+        IEnumerable<ModuleResponseDTO> modules = (
+                await query
+                .Include(m => m.Words)
+                .Take(take)
+                .ToListAsync()
+            ).Select(m => MapToDTO(m, wordsNumber));
         
 
         return Result.Ok(modules);
     }
 
-    public async Task<Result<ModuleResponseDTO>> GetModuleByIdAsync(int moduleId)
+    public override async Task<Result<ModuleResponseDTO>> GetEntityByIdAsync(int moduleId)
     {
         Module? module = await _context.Modules
             .Include(m => m.Words)
@@ -141,7 +139,7 @@ public class ModuleService : IModuleService
         return Result.Ok(MapToDTO(module));
     }
 
-    public async Task<Result<ModuleResponseDTO>> UpdateModuleAsync(ModuleUpdateDTO dto, int moduleId)
+    public override async Task<Result<ModuleResponseDTO>> UpdateEntityAsync(ModuleUpdateDTO dto, int moduleId)
     {
         Module? module = await _context.Modules.FindAsync(moduleId);
         if (module is null)
@@ -168,7 +166,7 @@ public class ModuleService : IModuleService
         return Result.Ok(MapToDTO(module));
     }
 
-    public Task SetWordsCollectionAsync(ref Module target, ModuleCreateDTO source)
+    private Task SetWordsCollectionAsync(ref Module target, ModuleCreateDTO source)
     {
         if(source.Words is null || !source.Words.Any())
         {

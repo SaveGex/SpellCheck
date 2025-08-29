@@ -2,6 +2,7 @@
 using DbManagerApi.Controllers.Filters;
 using DbManagerApi.Controllers.Filters.FilterAttributes;
 using DbManagerApi.Services;
+using DbManagerApi.Services.Abstracts;
 using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
@@ -19,7 +20,7 @@ namespace DbManagerApi.Controllers;
 [ApiController]
 public class ModulesController : ControllerBase
 {
-    private IModuleService ModuleService { get; set; }
+    private ModuleServiceAbstract ModuleService { get; set; }
     public ModulesController(SpellTestDbContext context)
     {
         ModuleService = new ModuleService(context);
@@ -34,7 +35,7 @@ public class ModulesController : ControllerBase
         [FromQuery] bool? reverse,
         [FromQuery] int? wordsIncludeNumber)
     {
-        Result<IEnumerable<ModuleResponseDTO>> result = await ModuleService.GetModulesSequenceAsync(propName, limit, moduleId, reverse, wordsIncludeNumber);
+        Result<IEnumerable<ModuleResponseDTO>> result = await ModuleService.GetEntitiesSequenceAsync(propName, limit, moduleId, reverse, wordsIncludeNumber);
         if (result.IsSuccess)
         {
             return Ok(result.Value);
@@ -46,7 +47,7 @@ public class ModulesController : ControllerBase
     [HttpGet("{moduleId:int}")]
     public async Task<IActionResult> GetModuleById(int moduleId)
     {
-        Result<ModuleResponseDTO> result = await ModuleService.GetModuleByIdAsync(moduleId);
+        Result<ModuleResponseDTO> result = await ModuleService.GetEntityByIdAsync(moduleId);
         if (result.IsSuccess)
         {
             return Ok(result.Value);
@@ -58,7 +59,7 @@ public class ModulesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateModule([FromBody] ModuleCreateDTO dto)
     {
-        Result<ModuleResponseDTO> result = await ModuleService.CreateModuleAsync(dto);
+        Result<ModuleResponseDTO> result = await ModuleService.CreateEntityAsync(dto);
         if (result.IsSuccess)
         {
             return Ok(result.Value);
@@ -71,7 +72,7 @@ public class ModulesController : ControllerBase
     [UserOwnership("moduleId", "Modules")]
     public async Task<IActionResult> UpdateModule([FromBody] ModuleUpdateDTO dto, int moduleId)
     {
-        Result<ModuleResponseDTO> result = await ModuleService.UpdateModuleAsync(dto, moduleId);
+        Result<ModuleResponseDTO> result = await ModuleService.UpdateEntityAsync(dto, moduleId);
         if (result.IsSuccess)
         {
             return Ok(result.Value);
@@ -83,7 +84,7 @@ public class ModulesController : ControllerBase
     [UserOwnership("moduleId", "Modules")]
     public async Task<IActionResult> DeleteModule(int moduleId)
     {
-        Result<ModuleResponseDTO> result = await ModuleService.DeleteModuleAsync(moduleId);
+        Result<ModuleResponseDTO> result = await ModuleService.DeleteEntityAsync(moduleId);
         if (result.IsSuccess)
         {
             return Ok(result.Value);

@@ -1,4 +1,5 @@
 ﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
+using DbManagerApi.Services.Abstractions;
 using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
@@ -11,7 +12,7 @@ using System.ComponentModel.DataAnnotations;
 namespace DbManagerApi.Services;
 
 
-public class WordService : IWordService
+public class WordService : WordServiceAbstraction
 {
     private readonly SpellTestDbContext _context;
     public WordService(SpellTestDbContext context)
@@ -34,7 +35,7 @@ public class WordService : IWordService
     }
 
     
-    public async Task<Result<WordResponseDTO>> CreateWordAsync(WordCreateDTO dto)
+    public override async Task<Result<WordResponseDTO>> CreateEntityAsync(WordCreateDTO dto)
     {
         Word word = new Word()
         {
@@ -63,8 +64,7 @@ public class WordService : IWordService
         return Result.Ok(MapToDTO(word));
     }
 
-    [UserOwnership("wordId", "Words")]
-    public async Task<Result<WordResponseDTO>> DeleteWordAsync(int wordId)
+    public override async Task<Result<WordResponseDTO>> DeleteEntityAsync(int wordId)
     {
         if(wordId <= 0)
         {
@@ -83,8 +83,7 @@ public class WordService : IWordService
         return Result.Ok(MapToDTO(word));
     }
 
-    [Authorize(Roles = $"{RoleNames.Manager}, {RoleNames.Admin}")]
-    public async Task<Result<IEnumerable<WordResponseDTO>>> GetAllWordsAsync()
+    public override async Task<Result<IEnumerable<WordResponseDTO>>> GetAllEntitiesAsync()
     {
         if(await _context.Words.AnyAsync() is false)
         {
@@ -94,7 +93,28 @@ public class WordService : IWordService
         return Result.Ok(_context.Words.Select(w => MapToDTO(w)).AsEnumerable());
     }
 
-    public async Task<Result<WordResponseDTO>> GetWordByIdAsync(int wordId)
+    public override async Task<Result<IEnumerable<WordResponseDTO>>> GetEntitiesSequenceAsync(string? propName, int? limit, int? moduleId, bool? reverse)
+    {
+        string orderBy = string.IsNullOrWhiteSpace(propName) ? nameof(Word.Id) : propName;
+        int take = Math.Clamp(limit ?? 100, 0, 1000);
+        int startId = moduleId ?? 1;
+        bool descending = reverse ?? false;
+
+        IQueryable<Word> query = _context.Words
+            .AsQueryable()
+            .Where(w => w.Id >= startId);
+
+        query = query.OrderByProperty(orderBy, descending);
+
+        IEnumerable<WordResponseDTO> words = await query
+            .Take(take)
+            .Select(w => MapToDTO(w))
+            .ToListAsync();
+
+        return Result.Ok(words);
+    }
+
+    public override async Task<Result<WordResponseDTO>> GetEntityByIdAsync(int wordId)
     {
         Word? word = await _context.Words.FindAsync(wordId);
         
@@ -107,7 +127,7 @@ public class WordService : IWordService
 
     }
 
-    public Task<Result<IEnumerable<WordResponseDTO>>> GetWordsByModuleIdAsync(int moduleId)
+    public override Task<Result<IEnumerable<WordResponseDTO>>> GetWordsByModuleIdAsync(int moduleId)
     {
         IEnumerable<WordResponseDTO> words = _context.Words.Where(w => w.ModuleId == moduleId)
             .Select(w => MapToDTO(w)).AsEnumerable();
@@ -120,8 +140,7 @@ public class WordService : IWordService
         return Task.FromResult<Result<IEnumerable<WordResponseDTO>>>(Result.Ok(words));
     }
 
-    [UserOwnership("wordId", "Words")]
-    public async Task<Result<WordResponseDTO>> UpdateWordAsync(WordUpdateDTO dto, int wordId)
+    public override async Task<Result<WordResponseDTO>> UpdateEntityAsync(WordUpdateDTO dto, int wordId)
     {
         Word? word = await _context.Words.FindAsync(wordId);
 

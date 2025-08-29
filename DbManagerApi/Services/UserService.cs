@@ -1,4 +1,5 @@
-﻿using DbManagerApi.Services.Interfaces;
+﻿using DbManagerApi.Services.Abstractions;
+using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
 using Infrastructure.Models;
@@ -7,8 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace DbManagerApi.Services;
-
-public class UserService : IUserService
+//Task AddRoleToUserAsync(int userId, int roleId);
+//Task RemoveRoleFromUserAsync(int userId, int roleId);
+public class UserService : UserServiceAbstract
 {
     private readonly SpellTestDbContext _context;
     public UserService(SpellTestDbContext context)
@@ -38,7 +40,7 @@ public class UserService : IUserService
     ///     Returning <see cref="UserResponseDTO"/> wrapped into <see cref="Result"/> instance if user succesfully created<br/>
     ///     Returning <see cref="Result{UserResponseDTO}"/> which represents <b><u>Fail</u></b> state for reasons described in error messages
     /// </returns>
-    public async Task<Result<UserResponseDTO>> CreateUserAsync(UserCreateDTO dto)
+    public override async Task<Result<UserResponseDTO>> CreateEntityAsync(UserCreateDTO dto)
     {
         if (string.IsNullOrEmpty(dto.Number) && string.IsNullOrEmpty(dto.Email))
             return Result.Fail("You must provide either Number or Email.");
@@ -68,7 +70,7 @@ public class UserService : IUserService
     /// </summary>
     /// <param name="userId">user id</param>
     /// <returns>Result that represents operation state</returns>
-    public async Task<Result<UserResponseDTO>> DeleteUserAsync(int userId)
+    public override async Task<Result<UserResponseDTO>> DeleteEntityAsync(int userId)
     {
         User? user = await _context.Users.FindAsync(userId);
 
@@ -91,7 +93,7 @@ public class UserService : IUserService
     /// A <see cref="Result{T}"/> containing an <see cref="IEnumerable{UserResponseDTO}"/> 
     /// if the operation is successful; otherwise, a failure result with error details.
     /// </returns>
-    public async Task<Result<IEnumerable<UserResponseDTO>>> GetUserSequenceAsync(string? propName, int? limit, int? userId, bool? reverse)
+    public override async Task<Result<IEnumerable<UserResponseDTO>>> GetEntitiesSequenceAsync(string? propName, int? limit, int? userId, bool? reverse)
     {
         string orderBy = string.IsNullOrWhiteSpace(propName) ? nameof(User.Id) : propName!;
         int take = Math.Clamp(limit ?? 100, 1, 1000); 
@@ -111,13 +113,12 @@ public class UserService : IUserService
         return Result.Ok(items.AsEnumerable());
     }
 
-
     /// <summary>
     /// Looking for user by specified <paramref name="userId"/>
     /// </summary>
     /// <param name="userId">Id of user which you want find</param>
     /// <returns><see cref="Result{UserResponseDTO}"/> which is also represents state</returns>
-    public async Task<Result<UserResponseDTO>> GetUserByIdAsync(int userId)
+    public override async Task<Result<UserResponseDTO>> GetEntityByIdAsync(int userId)
     {
         User? user = await _context.Users.FindAsync(userId);
         if(user is null)
@@ -134,7 +135,7 @@ public class UserService : IUserService
     /// <param name="dto">Information to update the old data of the <see cref="User"/> instance</param>
     /// <param name="userId">User id which will be updated</param>
     /// <returns><see cref="Result{UserResponseDTO}"/> that also represent operation status</returns>
-    public async Task<Result<UserResponseDTO>> UpdateUserAsync(UserUpdateDTO dto, int userId)
+    public override async Task<Result<UserResponseDTO>> UpdateEntityAsync(UserUpdateDTO dto, int userId)
     {
         User? user = await _context.Users.FindAsync(userId);
 

@@ -1,5 +1,6 @@
 ﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
 using DbManagerApi.Services;
+using DbManagerApi.Services.Abstractions;
 using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
@@ -15,7 +16,7 @@ namespace DbManagerApi.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private IUserService UserService { get; set; }
+    private UserServiceAbstract UserService { get; set; }
     public UsersController(SpellTestDbContext dbContext)
     {
         UserService = new UserService(dbContext);
@@ -25,7 +26,7 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddUser([FromBody]UserCreateDTO dto)
     {
-        Result<UserResponseDTO> result = await  UserService.CreateUserAsync(dto);
+        Result<UserResponseDTO> result = await  UserService.CreateEntityAsync(dto);
         if (result.IsSuccess)
         {
             return Ok(result.Value);
@@ -41,7 +42,7 @@ public class UsersController : ControllerBase
         [FromQuery] int? userId,
         [FromQuery] bool? reverse)
     {
-        var result = await UserService.GetUserSequenceAsync(propName, limit, userId, reverse);
+        var result = await UserService.GetEntitiesSequenceAsync(propName, limit, userId, reverse);
         if (result.IsSuccess)
             return Ok(result.Value);
 
@@ -52,7 +53,7 @@ public class UsersController : ControllerBase
     [HttpGet("{userId:int}")]
     public async Task<IActionResult> GetUserById(int userId)
     {
-        Result<UserResponseDTO> result = await UserService.GetUserByIdAsync(userId);
+        Result<UserResponseDTO> result = await UserService.GetEntityByIdAsync(userId);
         if (result.IsSuccess)
         {
             return Ok(result.Value);
@@ -65,7 +66,7 @@ public class UsersController : ControllerBase
     [UserOwnership("userId", "Users")]
     public async Task<IActionResult> UpdateUserById(int userId, [FromBody]UserUpdateDTO dto)
     {
-        Result<UserResponseDTO> result = await UserService.UpdateUserAsync(dto, userId);
+        Result<UserResponseDTO> result = await UserService.UpdateEntityAsync(dto, userId);
         if (result.IsSuccess)
         {
             return Ok(result.Value);
@@ -77,7 +78,7 @@ public class UsersController : ControllerBase
     [UserOwnership("userId", "Users")]
     public async Task<IActionResult> DeleteUserById(int userId)
     {
-        Result<UserResponseDTO> result = await UserService.DeleteUserAsync(userId);
+        Result<UserResponseDTO> result = await UserService.DeleteEntityAsync(userId);
         if (result.IsSuccess)
         {
             return Ok();

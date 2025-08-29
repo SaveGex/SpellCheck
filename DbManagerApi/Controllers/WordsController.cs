@@ -1,10 +1,9 @@
-﻿using DbManagerApi.Services;
-using DbManagerApi.Services.Interfaces;
+﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
+using DbManagerApi.Services;
+using DbManagerApi.Services.Abstractions;
 using FluentResults;
 using Infrastructure;
-using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DbManagerApi.Controllers;
@@ -13,7 +12,7 @@ namespace DbManagerApi.Controllers;
 [Route("api/[controller]")]
 public class WordsController : ControllerBase
 {
-    private IWordService WordService { get; set; }
+    private WordServiceAbstraction WordService { get; set; }
 
     public WordsController(SpellTestDbContext context)
     {
@@ -23,7 +22,7 @@ public class WordsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllWords()
     {
-        Result<IEnumerable<WordResponseDTO>> result = await WordService.GetAllWordsAsync();
+        Result<IEnumerable<WordResponseDTO>> result = await WordService.GetAllEntitiesAsync();
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);
@@ -34,7 +33,7 @@ public class WordsController : ControllerBase
     [HttpGet("{wordId:int}")]
     public async Task<IActionResult> GetWordById(int wordId)
     {
-        Result<WordResponseDTO> result = await WordService.GetWordByIdAsync(wordId);
+        Result<WordResponseDTO> result = await WordService.GetEntityByIdAsync(wordId);
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);
@@ -45,7 +44,7 @@ public class WordsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateWord([FromBody] WordCreateDTO dto)
     {
-        Result<WordResponseDTO> result = await WordService.CreateWordAsync(dto);
+        Result<WordResponseDTO> result = await WordService.CreateEntityAsync(dto);
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);
@@ -55,9 +54,10 @@ public class WordsController : ControllerBase
 
 
     [HttpPut("{wordId:int}")]
+    [UserOwnership("wordId", "Words")]
     public async Task<IActionResult> UpdateWord([FromBody] WordUpdateDTO dto, int wordId)
     {
-        Result<WordResponseDTO> result = await WordService.UpdateWordAsync(dto, wordId);
+        Result<WordResponseDTO> result = await WordService.UpdateEntityAsync(dto, wordId);
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);
@@ -66,9 +66,10 @@ public class WordsController : ControllerBase
     }
 
     [HttpDelete("{wordId:int}")]
+    [UserOwnership("wordId", "Words")]
     public async Task<IActionResult> DeleteWord(int wordId)
     {
-        Result<WordResponseDTO> result = await WordService.DeleteWordAsync(wordId);
+        Result<WordResponseDTO> result = await WordService.DeleteEntityAsync(wordId);
         if (result.IsFailed)
         {
             return BadRequest(result.Errors);

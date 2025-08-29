@@ -13,7 +13,7 @@ public class GuidModuleConditionFilter : IActionFilter
     {
         //throw new NotImplementedException();
     }
-    //тут виходить хуйня що при передаванні назви ідентифікатора то він генерується як повторний навіть якщо раніше тикого не задавав
+
     public void OnActionExecuting(ActionExecutingContext context)
     {
         foreach(object? contextObject in context.ActionArguments.Values)

@@ -11,5 +11,10 @@
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
+    <TabBar>
+        <ShellContent
+            Title="Modules"
+            ContentTemplate=""/>
+    </TabBar>
 
 </Shell>
