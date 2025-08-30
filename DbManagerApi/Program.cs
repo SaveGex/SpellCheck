@@ -29,7 +29,7 @@ app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi("/openapi/DbManagerApi.json");
     //app.UseSwagger();
     app.MapScalarApiReference();
 }

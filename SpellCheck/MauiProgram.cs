@@ -4,6 +4,8 @@ namespace SpellCheck
 {
     public static class MauiProgram
     {
+        public const string usernameKeyWord = "username";
+        public const string passwordKeyWord = "userPassword";
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
@@ -14,7 +16,6 @@ namespace SpellCheck
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
-
 
 #if DEBUG
             builder.Logging.AddDebug();
