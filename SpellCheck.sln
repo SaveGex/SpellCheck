@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageApi", "Storage\StorageApi.csproj", "{F8460354-A144-8E53-F09C-A390A9B59D58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientApi", "ClientApi\ClientApi.csproj", "{8642FEA6-F2F5-09C4-6C7E-226B5F27A4ED}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,10 +41,6 @@ Global
 		{F8460354-A144-8E53-F09C-A390A9B59D58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8460354-A144-8E53-F09C-A390A9B59D58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8460354-A144-8E53-F09C-A390A9B59D58}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8642FEA6-F2F5-09C4-6C7E-226B5F27A4ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8642FEA6-F2F5-09C4-6C7E-226B5F27A4ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8642FEA6-F2F5-09C4-6C7E-226B5F27A4ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8642FEA6-F2F5-09C4-6C7E-226B5F27A4ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,7 +50,6 @@ Global
 		{98EE59A5-F96F-436B-A9C9-F5B443BB4F61} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{5872AEB3-BAA3-FE31-B0EB-0FB6DBEDCF83} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{F8460354-A144-8E53-F09C-A390A9B59D58} = {F3CA272B-4C31-41D6-BB5C-40630F10C3E7}
-		{8642FEA6-F2F5-09C4-6C7E-226B5F27A4ED} = {397EA191-D310-4A04-9D38-82E05D4CFDCE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94A79AB7-B04A-4A37-A0F2-82096498757F}

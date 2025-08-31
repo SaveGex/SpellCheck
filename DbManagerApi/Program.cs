@@ -17,6 +17,7 @@ builder.Services.AddControllers(options =>
     .AddNewtonsoftJson();
 
 builder.Services.AddOpenApi();
+
 builder.Services.AddAuthentication("BasicAuthentication")
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 builder.Services.AddDbContext<SpellTestDbContext>();
@@ -31,7 +32,11 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi("/openapi/DbManagerApi.json");
     //app.UseSwagger();
-    app.MapScalarApiReference();
+    app.MapScalarApiReference(options =>
+    {
+        options.OpenApiRoutePattern = "/openapi/DbManagerApi.json";
+    });
+
 }
 
 app.UseHttpsRedirection();

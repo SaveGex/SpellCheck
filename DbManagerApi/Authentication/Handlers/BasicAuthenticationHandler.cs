@@ -53,7 +53,20 @@ namespace DbManagerApi.Authentication.Handlers
                 return AuthenticateResult.Fail("Invalid Authorization scheme");
             }
 
-            byte[] base64 = Convert.FromBase64String(parsedValue.Parameter!);
+            if (parsedValue.Parameter is null)
+            {
+                return AuthenticateResult.Fail("Invalid Authorization value");
+            }
+
+            byte[] base64;
+            try
+            {
+                base64 = Convert.FromBase64String(parsedValue.Parameter);
+            }
+            catch (Exception ex)
+            {
+                return AuthenticateResult.Fail(ex.Message);
+            }
             string[] credentials = Encoding.UTF8.GetString(base64).Split(':', 2);
 
             if (credentials.Length != 2)

@@ -12,21 +12,34 @@ public class BasicAuthorizationHandler : IAuthorizationHandler
         Client = apiClient;
     }
 
-    public async bool IsAuthorized()
+    public async Task<bool> IsAuthorizedAsync()
     {
-        string? username = await SecureStorage.Default.GetAsync(MauiProgram.username);
-        string? password = await SecureStorage.Default.GetAsync(MauiProgram.password);
-        if(username != null && password != null)
+        try
         {
+            await Client.AuthAsync();
+            return true;
+        }
+        catch (ApiException)
+        {
+            //(401/403)
+            return false;
+        }
+        catch (HttpRequestException ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Network error: {ex.Message}");
+            return false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            // timeout
+            System.Diagnostics.Debug.WriteLine($"Request timeout: {ex.Message}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Unexpected error: {ex}");
             return false;
         }
 
-
-        
-    }
-
-    public Task<bool> IsAuthorizedAsync()
-    {
-        throw new NotImplementedException();
     }
 }

@@ -1,10 +1,128 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:views="clr-namespace:SpellCheck.Views"
+             xmlns:vm="clr-namespace:SpellCheck.ViewModels"
              x:Class="SpellCheck.Views.LoginPage"
-             Title="LoginPage">
-    <VerticalStackLayout>
-        
-    </VerticalStackLayout>
+             x:DataType="vm:LoginPageViewModel"
+             Title="Login"
+             BackgroundColor="Transparent">
+
+    <ContentPage.Resources>
+        <!-- Gradient Brush -->
+        <LinearGradientBrush x:Key="PageGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#4A00E0" Offset="0.0" />
+            <GradientStop Color="#8E2DE2" Offset="0.5" />
+            <GradientStop Color="#FF6A88" Offset="1.0" />
+        </LinearGradientBrush>
+
+        <!-- Entry (only supported properties) -->
+        <Style x:Key="EntryBaseStyle" TargetType="Entry">
+            <Setter Property="HeightRequest" Value="50" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="TextColor" Value="Black" />
+            <Setter Property="PlaceholderColor" Value="#888" />
+            <Setter Property="Margin" Value="0,5" />
+        </Style>
+
+        <!-- Rounded container for Entry -->
+        <Style x:Key="EntryContainerStyle" TargetType="Border">
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="8" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Gradient button container -->
+        <Style x:Key="PrimaryButtonContainer" TargetType="Border">
+            <Setter Property="StrokeThickness" Value="0" />
+            <Setter Property="Background" Value="{StaticResource PageGradient}" />
+            <Setter Property="StrokeShape">
+                <Setter.Value>
+                    <RoundRectangle CornerRadius="25" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Actual Button (transparent so gradient shows through) -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="HeightRequest" Value="50" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="BorderColor" Value="Transparent" />
+        </Style>
+
+        <!-- Link label -->
+        <Style x:Key="LinkLabel" TargetType="Label">
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <StaticResource Key="PageGradient" />
+        </Grid.Background>
+
+        <ScrollView>
+            <!-- Центруємо і обмежуємо ширину -->
+            <VerticalStackLayout Padding="30"
+                                 Spacing="15"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 MaximumWidthRequest="400">
+
+                <Label Text="Login"
+                       FontSize="36"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center" />
+
+                <!-- Email or phone number -->
+                <Border Style="{StaticResource EntryContainerStyle}">
+                    <Entry Style="{StaticResource EntryBaseStyle}"
+                           Placeholder="Type your email or phone number"
+                           Text="{Binding Login}"/>
+                </Border>
+                <Label Text="{Binding LoginErrorValidation, Mode=OneWay}" TextColor="Red"/>
+
+                <!-- Password + Forgot -->
+                <Grid RowDefinitions="Auto" ColumnDefinitions="*,Auto">
+                    <Border Style="{StaticResource EntryContainerStyle}">
+                        <Entry Style="{StaticResource EntryBaseStyle}"
+                               Placeholder="Type your password"
+                               IsPassword="True" 
+                               Text="{Binding User.Password, Mode=OneWayToSource}"/>
+                    </Border>
+                    <Label Grid.Column="1"
+                           Style="{StaticResource LinkLabel}"
+                           Text="Forgot password?"
+                           VerticalOptions="Center"
+                           Margin="8,0,4,0">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+
+                <!-- Login button with gradient -->
+                <Border Style="{StaticResource PrimaryButtonContainer}">
+                    <Button Text="LOGIN"
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding LoginCommand}" />
+                </Border>
+
+                <!-- Повідомлення про помилку або інфо -->
+                <Label Text="{Binding AuthorizationError, Mode=OneWay}"
+                       TextColor="Red"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,10,0,0"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

@@ -1,21 +1,16 @@
-﻿using SpellCheck.Views;
+﻿using SpellCheck.Handlers.Interfaces;
+using SpellCheck.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SpellCheck
 {
     public partial class App : Application
     {
-        public App()
+        public App(SplashPage splashPage)
         {
             InitializeComponent();
 
-            bool isLogged = false;
-
-            if (!isLogged)
-            {
-                MainPage = new NavigationPage(new LoginPage());
-                return;
-            }
-            MainPage = new AppShell();
+            MainPage = splashPage;
         }
     }
 }

@@ -7,7 +7,7 @@ namespace SpellCheck
         public AppShell()
         {
             InitializeComponent();
-            //Routing.RegisterRoute(nameof(ModulesPage), typeof(ModulesPage));
+            //Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
         }
     }
 }

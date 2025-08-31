@@ -2,9 +2,9 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:SpellCheck.ViewModels"
-             xmlns:views="clr-namespace:SpellCheck.Views"
              x:Class="SpellCheck.Views.ModulesPage"
              Title="ModulesPage">
+    
     <ContentPage.BindingContext>
         <vm:ModulesPageViewModel/>
     </ContentPage.BindingContext>
