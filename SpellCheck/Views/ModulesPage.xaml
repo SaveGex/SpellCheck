@@ -8,11 +8,8 @@
     <ContentPage.BindingContext>
         <vm:ModulesPageViewModel/>
     </ContentPage.BindingContext>
-    
-    <VerticalStackLayout>
-        <Label 
-            Text="Modules to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+
+    <!--<ListView ItemsSource="">
+        
+    </ListView>-->
 </ContentPage>

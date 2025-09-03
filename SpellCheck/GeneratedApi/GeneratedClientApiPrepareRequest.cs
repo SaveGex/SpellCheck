@@ -3,7 +3,7 @@ using SpellCheck;
 using SpellCheck.Services.Converters;
 using System.Text;
 
-namespace ClientApi;
+namespace SpellCheck.GeneratedApi;
 
 public partial class GeneratedClientApi
 {
@@ -29,14 +29,12 @@ public partial class GeneratedClientApi
         var email = await SecureStorage.Default.GetAsync(MauiProgram.emailKeyWord);
         var phone = await SecureStorage.Default.GetAsync(MauiProgram.phoneKeyWord);
 
-        string? login = (email, phone) switch
+        GeneratedClientApi.login = (email, phone) switch
         {
             (not null, _) => email,
             (null, not null) => phone,
             _ => null
         };
-
-        GeneratedClientApi.login = login;
         GeneratedClientApi.password = await SecureStorage.Default.GetAsync(MauiProgram.passwordKeyWord);
     }
 

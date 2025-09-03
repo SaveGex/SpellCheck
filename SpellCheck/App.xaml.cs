@@ -10,7 +10,7 @@ namespace SpellCheck
         {
             InitializeComponent();
 
-            MainPage = splashPage;
+            MainPage = new NavigationPage(splashPage);
         }
     }
 }

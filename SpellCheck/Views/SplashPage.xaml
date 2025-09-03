@@ -3,12 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:SpellCheck.ViewModels"
              x:Class="SpellCheck.Views.SplashPage"
-             BackgroundColor="White">
+             BackgroundColor="Black">
 
     <Grid>
         <ActivityIndicator IsRunning="True"
                            VerticalOptions="Center"
                            HorizontalOptions="Center"
-                           Color="Black"/>
+                           Color="White"/>
     </Grid>
 </ContentPage>

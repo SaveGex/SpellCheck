@@ -1,4 +1,4 @@
-﻿using ClientApi;
+﻿using SpellCheck.GeneratedApi;
 using Microsoft.Maui.Storage;
 using SpellCheck.Handlers.Interfaces;
 

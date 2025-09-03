@@ -20,7 +20,8 @@ public class WordsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllWords()
+    [ProducesResponseType(typeof(IEnumerable<WordResponseDTO>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<WordResponseDTO>>> GetAllWords()
     {
         Result<IEnumerable<WordResponseDTO>> result = await WordService.GetAllEntitiesAsync();
         if (result.IsFailed)
@@ -31,7 +32,8 @@ public class WordsController : ControllerBase
     }
 
     [HttpGet("{wordId:int}")]
-    public async Task<IActionResult> GetWordById(int wordId)
+    [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<WordResponseDTO>> GetWordById(int wordId)
     {
         Result<WordResponseDTO> result = await WordService.GetEntityByIdAsync(wordId);
         if (result.IsFailed)
@@ -42,7 +44,8 @@ public class WordsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateWord([FromBody] WordCreateDTO dto)
+    [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<WordResponseDTO>> CreateWord([FromBody] WordCreateDTO dto)
     {
         Result<WordResponseDTO> result = await WordService.CreateEntityAsync(dto);
         if (result.IsFailed)
@@ -55,7 +58,8 @@ public class WordsController : ControllerBase
 
     [HttpPut("{wordId:int}")]
     [UserOwnership("wordId", "Words")]
-    public async Task<IActionResult> UpdateWord([FromBody] WordUpdateDTO dto, int wordId)
+    [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<WordResponseDTO>> UpdateWord([FromBody] WordUpdateDTO dto, int wordId)
     {
         Result<WordResponseDTO> result = await WordService.UpdateEntityAsync(dto, wordId);
         if (result.IsFailed)
@@ -67,7 +71,8 @@ public class WordsController : ControllerBase
 
     [HttpDelete("{wordId:int}")]
     [UserOwnership("wordId", "Words")]
-    public async Task<IActionResult> DeleteWord(int wordId)
+    [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<WordResponseDTO>> DeleteWord(int wordId)
     {
         Result<WordResponseDTO> result = await WordService.DeleteEntityAsync(wordId);
         if (result.IsFailed)
@@ -79,7 +84,8 @@ public class WordsController : ControllerBase
 
 
     [HttpGet("/api/module/{moduleId:int}/[controller]")]
-    public async Task<IActionResult> GetWordsByModuleId(int moduleId)
+    [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<WordResponseDTO>> GetWordsByModuleId(int moduleId)
     {
         Result<IEnumerable<WordResponseDTO>> result = await WordService.GetWordsByModuleIdAsync(moduleId);
         if (result.IsFailed)

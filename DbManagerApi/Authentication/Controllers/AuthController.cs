@@ -10,6 +10,7 @@ public class AuthController : ControllerBase
 {
     [HttpGet]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public Task<IActionResult> Hello()
     {
         return Task.FromResult<IActionResult>(Ok());

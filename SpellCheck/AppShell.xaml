@@ -6,8 +6,8 @@
     xmlns:local="clr-namespace:SpellCheck"
     xmlns:views="clr-namespace:SpellCheck.Views"
     Shell.FlyoutBehavior="Disabled"
+    x:DataType="local:AppShell"
     Title="SpellCheck">
-
 
     <Shell.Resources>
         <!-- Стиль для всієї панелі вкладок -->
@@ -22,28 +22,36 @@
             <Setter Property="Shell.TitleColor" Value="Green" />
             <Setter Property="Shell.ForegroundColor" Value="DarkGreen" />
         </Style>
+
+        <Style TargetType="ToolbarItem">
+            <Setter Property="Shell.TitleColor" Value="Red"/>
+        </Style>
+
     </Shell.Resources>
+
     <TabBar>
         
         <ShellContent
             Title="Home"
             ContentTemplate="{DataTemplate local:MainPage}"
             Route="MainPage" />
-        
-        
+
+
         <ShellContent
             Title="Modules"
             ContentTemplate="{DataTemplate views:ModulesPage}"
             Route="ModulesPage"/>
-        
-        
+
+
         <ShellContent
             Title="Learning"
             ContentTemplate="{DataTemplate views:LearningPage}"
-            Route="LearningPage">
-        </ShellContent>
-        
+            Route="LearningPage"/>
+
+        <ShellContent
+            Title="Log out"
+            ContentTemplate="{DataTemplate views:SplashPage}"
+            Route="ExitPage"/>
     </TabBar>
-    
 
 </Shell>

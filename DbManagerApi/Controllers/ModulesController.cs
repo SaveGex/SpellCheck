@@ -28,7 +28,8 @@ public class ModulesController : ControllerBase
 
 
     [HttpGet]
-    public async Task<IActionResult> GetAllModules(
+    [ProducesResponseType(typeof(IEnumerable<ModuleResponseDTO>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ModuleResponseDTO>> GetAllModules(
         [FromQuery] string? propName,
         [FromQuery] int? limit,
         [FromQuery] int? moduleId,
@@ -45,7 +46,8 @@ public class ModulesController : ControllerBase
 
 
     [HttpGet("{moduleId:int}")]
-    public async Task<IActionResult> GetModuleById(int moduleId)
+    [ProducesResponseType(typeof(ModuleResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ModuleResponseDTO>> GetModuleById(int moduleId)
     {
         Result<ModuleResponseDTO> result = await ModuleService.GetEntityByIdAsync(moduleId);
         if (result.IsSuccess)
@@ -57,7 +59,8 @@ public class ModulesController : ControllerBase
 
 
     [HttpPost]
-    public async Task<IActionResult> CreateModule([FromBody] ModuleCreateDTO dto)
+    [ProducesResponseType(typeof(ModuleResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ModuleResponseDTO>> CreateModule([FromBody] ModuleCreateDTO dto)
     {
         Result<ModuleResponseDTO> result = await ModuleService.CreateEntityAsync(dto);
         if (result.IsSuccess)
@@ -70,7 +73,8 @@ public class ModulesController : ControllerBase
 
     [HttpPut("{moduleId:int}")]
     [UserOwnership("moduleId", "Modules")]
-    public async Task<IActionResult> UpdateModule([FromBody] ModuleUpdateDTO dto, int moduleId)
+    [ProducesResponseType(typeof(ModuleResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ModuleResponseDTO>> UpdateModule([FromBody] ModuleUpdateDTO dto, int moduleId)
     {
         Result<ModuleResponseDTO> result = await ModuleService.UpdateEntityAsync(dto, moduleId);
         if (result.IsSuccess)
@@ -82,7 +86,8 @@ public class ModulesController : ControllerBase
 
     [HttpDelete("{moduleId:int}")]
     [UserOwnership("moduleId", "Modules")]
-    public async Task<IActionResult> DeleteModule(int moduleId)
+    [ProducesResponseType(typeof(ModuleResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ModuleResponseDTO>> DeleteModule(int moduleId)
     {
         Result<ModuleResponseDTO> result = await ModuleService.DeleteEntityAsync(moduleId);
         if (result.IsSuccess)

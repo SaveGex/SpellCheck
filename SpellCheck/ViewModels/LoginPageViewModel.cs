@@ -1,17 +1,17 @@
-﻿using ClientApi;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using SpellCheck.Enums;
+using SpellCheck.GeneratedApi;
 using SpellCheck.Handlers.Interfaces;
 using SpellCheck.Models;
 using SpellCheck.Services;
 using SpellCheck.Services.Providers.Interfaces;
+using SpellCheck.Views;
 using System.ComponentModel;
 using System.Windows.Input;
 
 namespace SpellCheck.ViewModels;
 public class LoginPageViewModel : INotifyPropertyChanged
 {
-
     private string _login = string.Empty;
     private string _errorMessage = string.Empty;
     private string _authorizationError = string.Empty;
@@ -44,30 +44,47 @@ public class LoginPageViewModel : INotifyPropertyChanged
         }
     }
 
+
     public User User { get; set; } = new User();
 
+    /// <summary>
+    /// More custom decision in relation to IMainPageProvider where you cannot access to an information about AuthorizationHandler.IsAuthorizedAsync() method.
+    /// </summary>
     private IAuthorizationHandler AuthorizationHandler { get; set; }
     public ICommand LoginCommand { get; set; }
     public ICommand ForgotPasswordCommand { get; set; }
+    public ICommand NavigateToRegisterCommand { get; set; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private ICredentialsProvider CredentialsProvider { get; set; }
-
-    public LoginPageViewModel(IAuthorizationHandler authorizationHandler, ICredentialsProvider credentialsProvider)
+    public LoginPageViewModel(IAuthorizationHandler authorizationHandler)
     {
         LoginCommand = new AsyncRelayCommand(LoginAsync);
         ForgotPasswordCommand = new AsyncRelayCommand(ForgotPassword);
+        NavigateToRegisterCommand = new AsyncRelayCommand(NavigateToRegister);
+
         AuthorizationHandler = authorizationHandler;
-        CredentialsProvider = credentialsProvider;
     }
 
-    #pragma warning disable CS1998
-        private async Task ForgotPassword()
+    private async Task NavigateToRegister()
+    {
+        if (Application.Current is null)
+        {
+            throw new Exception("Application.Current is null");
+        }
+        if(Application.Current.MainPage is null)
+        {
+            throw new Exception("Application.Current.MainPage is null");
+        }
+        await Application.Current.MainPage.Navigation.PushAsync(new RegisterPage(ServiceHelper.GetService<RegisterPageViewModel>()));
+    }
+
+#pragma warning disable CS1998
+    private async Task ForgotPassword()
         {
             throw new NotImplementedException();
         }
-    #pragma warning restore CS1998
+#pragma warning restore CS1998
 
     private async Task LoginAsync()
     {
@@ -100,9 +117,9 @@ public class LoginPageViewModel : INotifyPropertyChanged
 
         if(Application.Current is null)
         {
-            throw new Exception("App.Current is null");
+            throw new Exception("Application.Current is null");
         }
-        Application.Current.MainPage = new AppShell();
+        Application.Current.MainPage = new AppShell(); 
     }
 
     private async Task SetCredentials()

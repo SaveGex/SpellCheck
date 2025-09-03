@@ -1,8 +1,9 @@
-﻿using ClientApi;
+﻿using SpellCheck.GeneratedApi;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SpellCheck.Handlers;
 using SpellCheck.Handlers.Interfaces;
+using SpellCheck.Services;
 using SpellCheck.Services.Providers;
 using SpellCheck.Services.Providers.Interfaces;
 using SpellCheck.ViewModels;
@@ -33,12 +34,21 @@ namespace SpellCheck
 
             builder.Configuration.AddConfiguration(configurationBuilder);
 
+            //Providers
             builder.Services.AddSingleton<ICredentialsProvider, CredentialsProvider>();
+            builder.Services.AddTransient<IMainPageProviderAsync, MainPageProvider>();
 
+            //Handlers
             builder.Services.AddScoped<IAuthorizationHandler, BasicAuthorizationHandler>();
-            builder.Services.AddScoped<LoginPageViewModel>();
-            builder.Services.AddScoped<LoginPage>();
-            builder.Services.AddScoped<SplashPage>();
+
+            //ViewModels
+            builder.Services.AddTransient<LoginPageViewModel>();
+            builder.Services.AddTransient<RegisterPageViewModel>();
+
+            //Pages
+            builder.Services.AddTransient<SplashPage>();
+
+            //Others
             builder.Services.AddHttpClient<GeneratedClientApi>(client =>
             {
                 string? baseUrl = builder.Configuration["applicationBaseUrl"];
@@ -56,6 +66,14 @@ namespace SpellCheck
 #endif
 
             return builder.Build();
+        }
+
+        public static Task EraseCredentialEnvironments()
+        {
+            SecureStorage.Default.Remove(MauiProgram.phoneKeyWord);
+            SecureStorage.Default.Remove(MauiProgram.passwordKeyWord);
+            SecureStorage.Default.Remove(MauiProgram.emailKeyWord);
+            return Task.CompletedTask;
         }
     }
 }

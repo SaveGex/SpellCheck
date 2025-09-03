@@ -1,47 +1,29 @@
-using ClientApi;
+using SpellCheck.GeneratedApi;
 using SpellCheck.Handlers.Interfaces;
+using SpellCheck.Services.Providers.Interfaces;
 using SpellCheck.Views;
 
 namespace SpellCheck.Views
 {
+    [QueryProperty(nameof(SignOut), nameof(SignOut))]
     public partial class SplashPage : ContentPage
     {
-        private readonly IAuthorizationHandler _authorizationHandler;
-        private readonly LoginPage _loginPage;
-
-        public SplashPage(IAuthorizationHandler authorizationHandler, LoginPage loginPage)
+        public IMainPageProviderAsync MainPageProvider { get; init; }
+        public bool SignOut { get; set; } = false;
+        public SplashPage(IMainPageProviderAsync mainPageProviderAsync)
         {
             InitializeComponent();
-            _authorizationHandler = authorizationHandler;
-            _loginPage = loginPage;
+            MainPageProvider = mainPageProviderAsync;
         }
 
         protected async override void OnAppearing()
         {
             base.OnAppearing();
-            bool isLogged = false;
-            if (Application.Current is null)
+            if (SignOut)
             {
-                throw new Exception("Application.Current instance is null");
+                await MauiProgram.EraseCredentialEnvironments();
             }
-            try
-            {
-                await GeneratedClientApi.SetCredentialsAsync();
-                isLogged = await _authorizationHandler.IsAuthorizedAsync();
-            }
-            catch
-            {
-                Application.Current.MainPage = new NavigationPage(_loginPage);
-            }
-
-            if (!isLogged)
-            {
-                Application.Current.MainPage = new NavigationPage(_loginPage);
-            }
-            else
-            {
-                Application.Current.MainPage = new AppShell();
-            }
+            await MainPageProvider.UserAuthorizeAsync();
         }
     }
 }

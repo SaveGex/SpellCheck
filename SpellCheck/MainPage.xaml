@@ -5,6 +5,6 @@
              x:Class="SpellCheck.MainPage">
 
     <Grid>
-        <Label Text="asd"/>
+        <Label Text="news feed or smthg"/>
     </Grid>
 </ContentPage>

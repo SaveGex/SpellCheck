@@ -24,7 +24,8 @@ public class UsersController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<IActionResult> AddUser([FromBody]UserCreateDTO dto)
+    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UserResponseDTO>> AddUser([FromBody]UserCreateDTO dto)
     {
         Result<UserResponseDTO> result = await  UserService.CreateEntityAsync(dto);
         if (result.IsSuccess)
@@ -36,7 +37,8 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers(
+    [ProducesResponseType(typeof(IEnumerable<UserResponseDTO>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<UserResponseDTO>>> GetAllUsers(
         [FromQuery] string? propName,
         [FromQuery] int? limit,
         [FromQuery] int? userId,
@@ -51,7 +53,8 @@ public class UsersController : ControllerBase
 
 
     [HttpGet("{userId:int}")]
-    public async Task<IActionResult> GetUserById(int userId)
+    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UserResponseDTO>> GetUserById(int userId)
     {
         Result<UserResponseDTO> result = await UserService.GetEntityByIdAsync(userId);
         if (result.IsSuccess)
@@ -64,7 +67,8 @@ public class UsersController : ControllerBase
 
     [HttpPut("{userId:int}")]
     [UserOwnership("userId", "Users")]
-    public async Task<IActionResult> UpdateUserById(int userId, [FromBody]UserUpdateDTO dto)
+    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UserResponseDTO>> UpdateUserById(int userId, [FromBody]UserUpdateDTO dto)
     {
         Result<UserResponseDTO> result = await UserService.UpdateEntityAsync(dto, userId);
         if (result.IsSuccess)
@@ -76,7 +80,8 @@ public class UsersController : ControllerBase
 
     [HttpDelete("{userId:int}")]
     [UserOwnership("userId", "Users")]
-    public async Task<IActionResult> DeleteUserById(int userId)
+    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UserResponseDTO>> DeleteUserById(int userId)
     {
         Result<UserResponseDTO> result = await UserService.DeleteEntityAsync(userId);
         if (result.IsSuccess)
