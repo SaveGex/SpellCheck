@@ -67,10 +67,12 @@ jobs:
       run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
     - name: Apply EF Core migrations
-      run: dotnet ef database update \
-          --project DbManagerApi/DbManagerApi.csproj \
-          --startup-project DbManagerApi/DbManagerApi.csproj \
+      run: |
+        cd DbManagerApi
+        dotnet ef database update \
+          --startup-project . \
           --connection "Server=localhost,1433;Database=TestDb;User Id=sa;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
+
 
 
     - name: Run tests
