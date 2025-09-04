@@ -32,15 +32,24 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Setup .NET
+    - name: Setup .NET 9 SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
+
+    - name: Install MSSQL tools
+      run: |
+        sudo ACCEPT_EULA=Y apt-get install -y curl apt-transport-https gnupg
+        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+        curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+        sudo apt-get update
+        sudo ACCEPT_EULA=Y apt-get install -y mssql-tools18 unixodbc-dev
+        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
 
     - name: Wait for SQL Server
       run: |
         for i in {1..30}; do
-          /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${{ secrets.MSSQL_SA_PASSWORD }}" -Q "SELECT 1" && break
+          sqlcmd -S localhost -U sa -P "${{ secrets.MSSQL_SA_PASSWORD }}" -Q "SELECT 1" && break
           echo "Waiting for SQL Server..."
           sleep 2
         done
@@ -53,12 +62,15 @@ jobs:
 
     - name: Install EF Core tools
       run: dotnet tool install --global dotnet-ef
-    
+
     - name: Add .NET tools to PATH
       run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
     - name: Apply EF Core migrations
-      run: dotnet ef database update --project DbManagerApi/DbManagerApi.csproj
+      run: dotnet ef database update \
+              --project DbManagerApi/DbManagerApi.csproj \
+              --startup-project DbManagerApi/DbManagerApi.csproj \
+              --connection "Server=localhost,1433;Database=TestDb;User Id=sa;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
 
     - name: Run tests
       run: dotnet test $Solution_Name --configuration Release --no-build --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
