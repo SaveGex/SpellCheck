@@ -49,7 +49,7 @@ jobs:
     - name: Wait for SQL Server
       run: |
         for i in {1..30}; do
-          sqlcmd -С -S localhost -U sa -P "${{ secrets.MSSQL_SA_PASSWORD }}" -Q "SELECT 1" && break
+          sqlcmd -C -S localhost -U sa -P "${{ secrets.MSSQL_SA_PASSWORD }}" -Q "SELECT 1" && break
           echo "Waiting for SQL Server..."
           sleep 2
         done
