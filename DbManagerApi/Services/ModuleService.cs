@@ -1,14 +1,12 @@
-﻿using DbManagerApi.Services.Extentions;
-using DbManagerApi.Services.Interfaces;
+﻿using DbManagerApi.Services.Abstracts;
+using DbManagerApi.Services.Extentions;
 using FluentResults;
 using Infrastructure;
 using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using PropertyInfo = System.Reflection.PropertyInfo;
 using Module = Infrastructure.Models.Module;
-using DbManagerApi.Services.Abstracts;
 
 namespace DbManagerApi.Services;
 
@@ -92,7 +90,7 @@ public class ModuleService : ModuleServiceAbstract
         IEnumerable<Module> modules = await _context.Modules
             .ToListAsync();
 
-        if(!modules.Any())
+        if (!modules.Any())
         {
             return Result.Fail<IEnumerable<ModuleResponseDTO>>("No modules found. Or Sequence does not contain any modules");
         }
@@ -121,7 +119,7 @@ public class ModuleService : ModuleServiceAbstract
                 .Take(take)
                 .ToListAsync()
             ).Select(m => MapToDTO(m, wordsNumber));
-        
+
 
         return Result.Ok(modules);
     }
@@ -146,13 +144,13 @@ public class ModuleService : ModuleServiceAbstract
         {
             return Result.Fail("Module does not found.");
         }
-        if(dto.Identifier is not null && 
+        if (dto.Identifier is not null &&
             await _context.Modules.AnyAsync(m => dto.Identifier == m.Identifier))
-        {     
+        {
             return Result.Fail("Module with the same unique identifier already exists");
         }
         //if identifier was not generated inner the filter
-        else if(dto.Identifier is null)
+        else if (dto.Identifier is null)
         {
             //change the null value for avoid NullReferenceException during SetValues()
             dto.Identifier = module.Identifier;
@@ -168,7 +166,7 @@ public class ModuleService : ModuleServiceAbstract
 
     private Task SetWordsCollectionAsync(ref Module target, ModuleCreateDTO source)
     {
-        if(source.Words is null || !source.Words.Any())
+        if (source.Words is null || !source.Words.Any())
         {
             return Task.CompletedTask;
         }

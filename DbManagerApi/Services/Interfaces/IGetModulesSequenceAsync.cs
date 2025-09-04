@@ -1,5 +1,4 @@
-﻿using Azure;
-using FluentResults;
+﻿using FluentResults;
 using Infrastructure.Models.ModelsDTO;
 
 namespace DbManagerApi.Services.Interfaces

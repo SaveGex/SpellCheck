@@ -1,11 +1,9 @@
 ﻿using DbManagerApi.Services.Abstractions;
-using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
 using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace DbManagerApi.Services;
 //Task AddRoleToUserAsync(int userId, int roleId);
@@ -74,7 +72,7 @@ public class UserService : UserServiceAbstract
     {
         User? user = await _context.Users.FindAsync(userId);
 
-        if(user is null)
+        if (user is null)
         {
             return Result.Fail($"User does not found.");
         }
@@ -96,7 +94,7 @@ public class UserService : UserServiceAbstract
     public override async Task<Result<IEnumerable<UserResponseDTO>>> GetEntitiesSequenceAsync(string? propName, int? limit, int? userId, bool? reverse)
     {
         string orderBy = string.IsNullOrWhiteSpace(propName) ? nameof(User.Id) : propName!;
-        int take = Math.Clamp(limit ?? 100, 1, 1000); 
+        int take = Math.Clamp(limit ?? 100, 1, 1000);
         int startId = userId ?? 1;
         bool descending = reverse ?? false;
 
@@ -121,7 +119,7 @@ public class UserService : UserServiceAbstract
     public override async Task<Result<UserResponseDTO>> GetEntityByIdAsync(int userId)
     {
         User? user = await _context.Users.FindAsync(userId);
-        if(user is null)
+        if (user is null)
         {
             return Result.Fail("User does not found.");
         }
@@ -139,7 +137,7 @@ public class UserService : UserServiceAbstract
     {
         User? user = await _context.Users.FindAsync(userId);
 
-        if( user is null)
+        if (user is null)
         {
             return Result.Fail("User does not found");
         }

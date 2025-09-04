@@ -1,10 +1,8 @@
 using DbManagerApi.Authentication.Handlers;
 using DbManagerApi.JsonPatchSample;
 using DbManagerApi.Services;
-using DbManagerApi.Services.Converters;
 using DbManagerApi.Services.Interfaces;
 using Infrastructure;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Authentication;
 using Scalar.AspNetCore;
 
@@ -31,7 +29,7 @@ app.UseAuthorization();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi("/openapi/DbManagerApi.json");
-    //app.UseSwagger();
+
     app.MapScalarApiReference(options =>
     {
         options.OpenApiRoutePattern = "/openapi/DbManagerApi.json";

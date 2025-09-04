@@ -1,7 +1,6 @@
 ﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
 using DbManagerApi.Services;
 using DbManagerApi.Services.Abstractions;
-using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
 using Infrastructure.Models;
@@ -25,14 +24,14 @@ public class UsersController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
-    public async Task<ActionResult<UserResponseDTO>> AddUser([FromBody]UserCreateDTO dto)
+    public async Task<ActionResult<UserResponseDTO>> AddUser([FromBody] UserCreateDTO dto)
     {
-        Result<UserResponseDTO> result = await  UserService.CreateEntityAsync(dto);
+        Result<UserResponseDTO> result = await UserService.CreateEntityAsync(dto);
         if (result.IsSuccess)
         {
             return Ok(result.Value);
         }
-        
+
         return BadRequest(result.Errors);
     }
 
@@ -68,7 +67,7 @@ public class UsersController : ControllerBase
     [HttpPut("{userId:int}")]
     [UserOwnership("userId", "Users")]
     [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
-    public async Task<ActionResult<UserResponseDTO>> UpdateUserById(int userId, [FromBody]UserUpdateDTO dto)
+    public async Task<ActionResult<UserResponseDTO>> UpdateUserById(int userId, [FromBody] UserUpdateDTO dto)
     {
         Result<UserResponseDTO> result = await UserService.UpdateEntityAsync(dto, userId);
         if (result.IsSuccess)

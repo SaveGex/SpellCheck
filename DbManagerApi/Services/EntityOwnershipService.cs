@@ -2,7 +2,6 @@
 using Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace DbManagerApi.Services;
 
@@ -38,12 +37,12 @@ public class EntityOwnershipService : IEntityOwnershipService
             throw new ArgumentException($"Entity with name '{entityName}' and ID '{entityId}' does not exist.");
         }
 
-        if(entity.GetType().GetProperty("AuthorId") is not PropertyInfo AuthorId)
+        if (entity.GetType().GetProperty("AuthorId") is not PropertyInfo AuthorId)
         {
             throw new ArgumentException($"Entity with name '{entityName}' does not have an 'AuthorId' property.");
         }
 
-        if(AuthorId.GetValue(entity) is int authorId && authorId == userId)
+        if (AuthorId.GetValue(entity) is int authorId && authorId == userId)
         {
             return true;
         }

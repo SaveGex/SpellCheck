@@ -4,9 +4,9 @@ using Infrastructure.Models.ModelsDTO;
 
 namespace DbManagerApi.Services.Abstracts
 {
-    public abstract class ModuleServiceAbstract : 
+    public abstract class ModuleServiceAbstract :
         IGetModulesSequenceAsync,
-        ICreateEntityAsync<ModuleResponseDTO, ModuleCreateDTO>, 
+        ICreateEntityAsync<ModuleResponseDTO, ModuleCreateDTO>,
         IDeleteEntityAsync<ModuleResponseDTO>,
         IGetEntityByIdAsync<ModuleResponseDTO>,
         IUpdateEntityAsync<ModuleResponseDTO, ModuleUpdateDTO>

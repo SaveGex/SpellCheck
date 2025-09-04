@@ -1,17 +1,10 @@
-﻿using DbManagerApi.Authentication.Handlers;
-using DbManagerApi.Controllers.Filters;
-using DbManagerApi.Controllers.Filters.FilterAttributes;
+﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
 using DbManagerApi.Services;
 using DbManagerApi.Services.Abstracts;
-using DbManagerApi.Services.Interfaces;
 using FluentResults;
 using Infrastructure;
-using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel;
-using System.Security.Claims;
 
 namespace DbManagerApi.Controllers;
 

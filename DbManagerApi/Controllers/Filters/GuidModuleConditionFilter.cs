@@ -1,7 +1,5 @@
-﻿using Infrastructure.Models;
-using Infrastructure.Models.ModelsDTO;
+﻿using Infrastructure.Models.ModelsDTO;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Data.Common;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -16,9 +14,9 @@ public class GuidModuleConditionFilter : IActionFilter
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
-        foreach(object? contextObject in context.ActionArguments.Values)
+        foreach (object? contextObject in context.ActionArguments.Values)
         {
-            if(contextObject is ModuleCreateDTO or ModuleUpdateDTO)
+            if (contextObject is ModuleCreateDTO or ModuleUpdateDTO)
             {
                 dynamic module = (dynamic)contextObject;
                 switch (module.IdentifierName)
