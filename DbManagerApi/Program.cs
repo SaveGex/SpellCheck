@@ -6,6 +6,7 @@ using DbManagerApi.Services.Interfaces;
 using Infrastructure;
 using Infrastructure.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,7 +21,11 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddAuthentication("BasicAuthentication")
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
-builder.Services.AddDbContext<SpellTestDbContext>();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<SpellTestDbContext>(options => 
+                                            options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IEntityOwnershipService, EntityOwnershipService>();
 
 var app = builder.Build();

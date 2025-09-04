@@ -8,7 +8,6 @@ namespace Infrastructure;
 
 public partial class SpellTestDbContext : DbContext
 {
-    private IConfiguration _configuration = null!;
     public SpellTestDbContext()
     {
     }
@@ -31,14 +30,6 @@ public partial class SpellTestDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Word> Words { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.AddJsonFile("Configuration\\appsettings.json", optional: false, reloadOnChange: true);
-        _configuration = configurationBuilder.Build();
-        optionsBuilder.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"));
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
