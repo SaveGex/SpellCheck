@@ -51,7 +51,7 @@ namespace SpellCheck
             //Others
             builder.Services.AddHttpClient<GeneratedClientApi>(client =>
             {
-                string? baseUrl = builder.Configuration["applicationBaseUrl"];
+                string? baseUrl = "https://opsik.bsite.net/";
                 if (baseUrl == null)
                 {
                     throw new Exception("Base url is null");
