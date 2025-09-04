@@ -51,6 +51,15 @@ jobs:
     - name: Build
       run: dotnet build $Solution_Name --configuration Release --no-restore
 
+    - name: Install EF Core tools
+      run: dotnet tool install --global dotnet-ef
+    
+    - name: Add .NET tools to PATH
+      run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+    - name: Apply EF Core migrations
+      run: dotnet ef database update --project DbManagerApi/DbManagerApi.csproj
+
     - name: Run tests
       run: dotnet test $Solution_Name --configuration Release --no-build --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
 
