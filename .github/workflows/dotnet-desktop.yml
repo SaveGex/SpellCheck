@@ -68,9 +68,10 @@ jobs:
 
     - name: Apply EF Core migrations
       run: dotnet ef database update \
-              --project DbManagerApi/DbManagerApi.csproj \
-              --startup-project DbManagerApi/DbManagerApi.csproj \
-              --connection "Server=localhost,1433;Database=TestDb;User Id=sa;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
+          --project DbManagerApi/DbManagerApi.csproj \
+          --startup-project DbManagerApi/DbManagerApi.csproj \
+          --connection "Server=localhost,1433;Database=TestDb;User Id=sa;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
+
 
     - name: Run tests
       run: dotnet test $Solution_Name --configuration Release --no-build --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
