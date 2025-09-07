@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
         return BadRequest(result.Errors);
     }
 
-    [HttpGet("users")]
+    [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<UserResponseDTO>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<UserResponseDTO>>> GetAllUsers(
         [FromQuery] string? propName,
