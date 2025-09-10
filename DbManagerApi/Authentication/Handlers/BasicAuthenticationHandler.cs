@@ -3,7 +3,6 @@ using Infrastructure.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -24,8 +23,8 @@ namespace DbManagerApi.Authentication.Handlers
             Phone
         }
 
-        public BasicAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, 
-            ILoggerFactory logger, 
+        public BasicAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
+            ILoggerFactory logger,
             UrlEncoder encoder,
             SpellTestDbContext dbContext)
             : base(options, logger, encoder)
@@ -33,7 +32,7 @@ namespace DbManagerApi.Authentication.Handlers
             _context = dbContext;
         }
 
-        
+
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             if (!Request.Headers.ContainsKey("Authorization"))

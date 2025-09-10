@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Infrastructure.Models;
+﻿namespace Infrastructure.Models;
 
 public partial class Friend
 {

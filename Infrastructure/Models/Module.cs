@@ -15,6 +15,7 @@ public partial class Module
     public Guid Identifier { get; set; }
 
     public string Name { get; set; } = null!;
+    public string? Description { get; set; }
     [Required(ErrorMessage = "Module cannot exists without author")]
     public int AuthorId { get; set; }
 
@@ -28,12 +29,12 @@ public partial class Module
 
     public override bool Equals(object? obj)
     {
-        if(obj is not Module module)
+        if (obj is not Module module)
         {
             return false;
         }
 
-        if(module.GetHashCode() == this.GetHashCode())
+        if (module.GetHashCode() == this.GetHashCode())
         {
             return true;
         }

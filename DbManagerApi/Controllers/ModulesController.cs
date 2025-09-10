@@ -1,17 +1,12 @@
-﻿using DbManagerApi.Authentication.Handlers;
-using DbManagerApi.Controllers.Filters;
-using DbManagerApi.Controllers.Filters.FilterAttributes;
+﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
 using DbManagerApi.Services;
 using DbManagerApi.Services.Abstracts;
-using DbManagerApi.Services.Interfaces;
+using DbManagerApi.Services.ModuleServices;
 using FluentResults;
 using Infrastructure;
-using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel;
-using System.Security.Claims;
+using MR.AspNetCore.Pagination;
 
 namespace DbManagerApi.Controllers;
 
@@ -20,25 +15,27 @@ namespace DbManagerApi.Controllers;
 [ApiController]
 public class ModulesController : ControllerBase
 {
-    private ModuleServiceAbstract ModuleService { get; set; }
-    public ModulesController(SpellTestDbContext context)
+    private ModuleServiceCursor ModuleService { get; set; }
+    public ModulesController(SpellTestDbContext context, IPaginationService paginationService)
     {
-        ModuleService = new ModuleService(context);
+        ModuleService = new ModuleServiceCursor(context, paginationService);
     }
 
 
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<ModuleResponseDTO>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ModuleResponseDTO>> GetAllModules(
+    [ProducesResponseType(typeof(KeysetPaginationResult<ModuleResponseDTO>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<KeysetPaginationResult<ModuleResponseDTO>>> GetAllModules(
+        [FromQuery] string? after,
         [FromQuery] string? propName,
         [FromQuery] int? limit,
         [FromQuery] int? moduleId,
         [FromQuery] bool? reverse,
         [FromQuery] int? wordsIncludeNumber)
     {
-        Result<IEnumerable<ModuleResponseDTO>> result = await ModuleService.GetEntitiesSequenceAsync(propName, limit, moduleId, reverse, wordsIncludeNumber);
+        var result = await ModuleService.GetModulesKeySetPaginationAsync(after, propName, limit, moduleId, reverse, wordsIncludeNumber);
         if (result.IsSuccess)
         {
+            Response.Headers.Append("After", await ModuleService.GetCursorBase64StringAsync(result.Value.Data.LastOrDefault(), propName));
             return Ok(result.Value);
         }
         return BadRequest(result.Errors);

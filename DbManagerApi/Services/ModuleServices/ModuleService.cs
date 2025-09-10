@@ -1,21 +1,21 @@
-﻿using DbManagerApi.Services.Extentions;
-using DbManagerApi.Services.Interfaces;
+﻿using DbManagerApi.Services.Abstracts;
+using DbManagerApi.Services.Extentions;
+using DbManagerApi.Services.WordServices;
 using FluentResults;
 using Infrastructure;
 using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
 using Microsoft.EntityFrameworkCore;
+using MR.AspNetCore.Pagination;
 using System.Linq.Expressions;
-using PropertyInfo = System.Reflection.PropertyInfo;
 using Module = Infrastructure.Models.Module;
-using DbManagerApi.Services.Abstracts;
 
-namespace DbManagerApi.Services;
+namespace DbManagerApi.Services.ModuleServices;
 
 public class ModuleService : ModuleServiceAbstract
 {
 
-    private readonly SpellTestDbContext _context;
+    protected readonly SpellTestDbContext _context;
 
     public ModuleService(SpellTestDbContext context)
     {
@@ -92,7 +92,7 @@ public class ModuleService : ModuleServiceAbstract
         IEnumerable<Module> modules = await _context.Modules
             .ToListAsync();
 
-        if(!modules.Any())
+        if (!modules.Any())
         {
             return Result.Fail<IEnumerable<ModuleResponseDTO>>("No modules found. Or Sequence does not contain any modules");
         }
@@ -100,7 +100,7 @@ public class ModuleService : ModuleServiceAbstract
         return Result.Ok(modules.Select(m => MapToDTO(m)).AsEnumerable());
     }
 
-    public override async Task<Result<IEnumerable<ModuleResponseDTO>>> GetEntitiesSequenceAsync(string? propName, int? limit, int? moduleId, bool? reverse, int? wordsIncludeNumber)
+    public override async Task<Result<IEnumerable<ModuleResponseDTO>>> GetModulesSequenceAsync(string? propName, int? limit, int? moduleId, bool? reverse, int? wordsIncludeNumber)
     {
         string orderBy = string.IsNullOrWhiteSpace(propName) ? nameof(Module.Id) : propName;
         int take = Math.Clamp(limit ?? 100, 1, 1000);
@@ -121,7 +121,7 @@ public class ModuleService : ModuleServiceAbstract
                 .Take(take)
                 .ToListAsync()
             ).Select(m => MapToDTO(m, wordsNumber));
-        
+
 
         return Result.Ok(modules);
     }
@@ -146,13 +146,13 @@ public class ModuleService : ModuleServiceAbstract
         {
             return Result.Fail("Module does not found.");
         }
-        if(dto.Identifier is not null && 
+        if (dto.Identifier is not null &&
             await _context.Modules.AnyAsync(m => dto.Identifier == m.Identifier))
-        {     
+        {
             return Result.Fail("Module with the same unique identifier already exists");
         }
         //if identifier was not generated inner the filter
-        else if(dto.Identifier is null)
+        else if (dto.Identifier is null)
         {
             //change the null value for avoid NullReferenceException during SetValues()
             dto.Identifier = module.Identifier;
@@ -168,7 +168,7 @@ public class ModuleService : ModuleServiceAbstract
 
     private Task SetWordsCollectionAsync(ref Module target, ModuleCreateDTO source)
     {
-        if(source.Words is null || !source.Words.Any())
+        if (source.Words is null || !source.Words.Any())
         {
             return Task.CompletedTask;
         }
@@ -182,4 +182,5 @@ public class ModuleService : ModuleServiceAbstract
 
         return Task.CompletedTask;
     }
+
 }

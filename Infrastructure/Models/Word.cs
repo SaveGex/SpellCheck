@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Infrastructure.Models;
 
@@ -31,7 +28,7 @@ public partial class Word
 
     public override bool Equals(object? obj)
     {
-        if(obj is not Word word)
+        if (obj is not Word word)
         {
             return false;
         }

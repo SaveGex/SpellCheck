@@ -1,10 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json.Serialization;
 
 namespace Infrastructure.Models.ModelsDTO;
@@ -13,12 +8,13 @@ namespace Infrastructure.Models.ModelsDTO;
 public class ModuleResponseDTO
 {
     public int Id { get; set; }
-    public string? IdentifierName { get; set; } 
+    public string? IdentifierName { get; set; }
     [Key]
     public Guid Identifier { get; set; }
     [Required(ErrorMessage = "Module name is required."), Key]
     public string Name { get; set; } = null!;
     [Required(ErrorMessage = "AuthorId is required."), Key]
+    public string? Description { get; set; }
     public int AuthorId { get; set; }
 
     public DateTime CreatedAt { get; set; }
@@ -34,9 +30,11 @@ public class ModuleCreateDTO
     [Required(ErrorMessage = "Module name is required."), Key]
     public string Name { get; set; } = null!;
     [Required(ErrorMessage = "AuthorId is required."), Key]
+    public string? Description { get; set; }
+
     public int AuthorId { get; set; }
     public ICollection<WordCreateDTO>? Words { get; set; } = new List<WordCreateDTO>();
-   
+
 }
 
 
@@ -47,5 +45,7 @@ public class ModuleUpdateDTO
     public Guid? Identifier { get; set; }
     [Required(ErrorMessage = "Module name is required."), Key]
     public string Name { get; set; } = null!;
+    public string? Description { get; set; }
+
     public ICollection<WordUpdateDTO>? Words { get; set; } = new List<WordUpdateDTO>();
 }

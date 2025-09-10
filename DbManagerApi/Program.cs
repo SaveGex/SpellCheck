@@ -1,10 +1,10 @@
 using DbManagerApi.Authentication.Handlers;
 using DbManagerApi.JsonPatchSample;
 using DbManagerApi.Services;
-using DbManagerApi.Services.Converters;
+using DbManagerApi.Services.Abstracts;
 using DbManagerApi.Services.Interfaces;
+using DbManagerApi.Services.ModuleServices;
 using Infrastructure;
-using Infrastructure.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -17,6 +17,7 @@ builder.Services.AddControllers(options =>
 })
     .AddNewtonsoftJson();
 
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
 builder.Services.AddAuthentication("BasicAuthentication")
@@ -24,9 +25,9 @@ builder.Services.AddAuthentication("BasicAuthentication")
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<SpellTestDbContext>(options => 
-                                            options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<SpellTestDbContext>();
 builder.Services.AddScoped<IEntityOwnershipService, EntityOwnershipService>();
+builder.Services.AddPagination();
 
 var app = builder.Build();
 
@@ -36,7 +37,6 @@ app.UseAuthorization();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi("/openapi/DbManagerApi.json");
-    //app.UseSwagger();
     app.MapScalarApiReference(options =>
     {
         options.OpenApiRoutePattern = "/openapi/DbManagerApi.json";

@@ -1,15 +1,11 @@
-﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
-using DbManagerApi.Services.Abstractions;
-using DbManagerApi.Services.Interfaces;
+﻿using DbManagerApi.Services.Abstractions;
 using FluentResults;
 using Infrastructure;
 using Infrastructure.Models;
 using Infrastructure.Models.ModelsDTO;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
-namespace DbManagerApi.Services;
+namespace DbManagerApi.Services.WordServices;
 
 
 public class WordService : WordServiceAbstraction
@@ -34,7 +30,7 @@ public class WordService : WordServiceAbstraction
         };
     }
 
-    
+
     public override async Task<Result<WordResponseDTO>> CreateEntityAsync(WordCreateDTO dto)
     {
         Word word = new Word()
@@ -45,14 +41,14 @@ public class WordService : WordServiceAbstraction
             Meaning = dto.Meaning,
             DifficultyId = dto.DifficultyId
         };
-        
+
 
         if (await _context.Words.AnyAsync(w =>
-            (
+            
                 w.ModuleId == word.ModuleId &&
                 w.Expression.ToLower() == word.Expression.ToLower() &&
                 w.Meaning.ToLower() == word.Meaning.ToLower()
-            )
+            
         ))
         {
             return Result.Fail("The same Word in the same Module already exists.");
@@ -66,7 +62,7 @@ public class WordService : WordServiceAbstraction
 
     public override async Task<Result<WordResponseDTO>> DeleteEntityAsync(int wordId)
     {
-        if(wordId <= 0)
+        if (wordId <= 0)
         {
             return Result.Fail<WordResponseDTO>("Invalid word ID.");
         }
@@ -85,7 +81,7 @@ public class WordService : WordServiceAbstraction
 
     public override async Task<Result<IEnumerable<WordResponseDTO>>> GetAllEntitiesAsync()
     {
-        if(await _context.Words.AnyAsync() is false)
+        if (await _context.Words.AnyAsync() is false)
         {
             return Result.Fail<IEnumerable<WordResponseDTO>>("No words found.");
         }
@@ -117,8 +113,8 @@ public class WordService : WordServiceAbstraction
     public override async Task<Result<WordResponseDTO>> GetEntityByIdAsync(int wordId)
     {
         Word? word = await _context.Words.FindAsync(wordId);
-        
-        if(word is null)
+
+        if (word is null)
         {
             return Result.Fail("Word not found.");
         }
@@ -137,14 +133,14 @@ public class WordService : WordServiceAbstraction
             return Task.FromResult<Result<IEnumerable<WordResponseDTO>>>(Result.Fail("No words found for the specified module ID.\n Or the module doesn't has any words"));
         }
 
-        return Task.FromResult<Result<IEnumerable<WordResponseDTO>>>(Result.Ok(words));
+        return Task.FromResult(Result.Ok(words));
     }
 
     public override async Task<Result<WordResponseDTO>> UpdateEntityAsync(WordUpdateDTO dto, int wordId)
     {
         Word? word = await _context.Words.FindAsync(wordId);
 
-        if(word is null)
+        if (word is null)
         {
             return Result.Fail<WordResponseDTO>("Word not found.");
         }

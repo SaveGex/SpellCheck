@@ -23,7 +23,7 @@ namespace Infrastructure.Models.ModelsDTO
     }
 
     [RequireNumberOrEmail]
-    public class  UserCreateDTO
+    public class UserCreateDTO
     {
         [StringLength(maximumLength: 32, ErrorMessage = "Username cannot be longer than 32 characters.")]
         public string Username { get; set; } = null!;

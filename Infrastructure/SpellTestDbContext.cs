@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Infrastructure.Models;
+﻿using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using File = Infrastructure.Models.File;
@@ -25,11 +23,20 @@ public partial class SpellTestDbContext : DbContext
 
     public virtual DbSet<Module> Modules { get; set; }
 
-    public virtual DbSet<Role> Roles{ get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Word> Words { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+        var configuration = configurationBuilder
+            .AddUserSecrets<SpellTestDbContext>()
+            .Build();
+        optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection")); // from 'dotnet user-secrets'
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -86,6 +93,9 @@ public partial class SpellTestDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(256);
 
+            entity.Property(e => e.Description)
+                .HasMaxLength(1024);
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("smalldatetime")
@@ -114,7 +124,7 @@ public partial class SpellTestDbContext : DbContext
         modelBuilder.Entity<Role>(entity =>
         {
             entity.HasKey(e => e.Id);
-            
+
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("Id");

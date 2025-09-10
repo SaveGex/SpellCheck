@@ -1,10 +1,12 @@
 ﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
-using DbManagerApi.Services;
+using DbManagerApi.Services.WordServices;
 using DbManagerApi.Services.Abstractions;
 using FluentResults;
 using Infrastructure;
 using Infrastructure.Models.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Infrastructure.Models;
 
 namespace DbManagerApi.Controllers;
 
@@ -20,6 +22,7 @@ public class WordsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = $"{RoleNames.Manager}, {RoleNames.Admin}")]
     [ProducesResponseType(typeof(IEnumerable<WordResponseDTO>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<WordResponseDTO>>> GetAllWords()
     {

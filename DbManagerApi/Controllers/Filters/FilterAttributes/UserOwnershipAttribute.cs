@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Infrastructure.Models;
+﻿using Infrastructure.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DbManagerApi.Controllers.Filters.FilterAttributes;
 
