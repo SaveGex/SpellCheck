@@ -1,8 +1,8 @@
-﻿using Infrastructure.Models;
+﻿using DomainData.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using File = Infrastructure.Models.File;
-namespace Infrastructure;
+using File = DomainData.Models.File;
+namespace DomainData;
 
 public partial class SpellTestDbContext : DbContext
 {
@@ -140,9 +140,9 @@ public partial class SpellTestDbContext : DbContext
         });
 
         modelBuilder.Entity<Role>().HasData(
-            new Role { Id = 1, Name = RoleNames.Admin },
-            new Role { Id = 2, Name = RoleNames.Manager },
-            new Role { Id = 3, Name = RoleNames.User }
+            new Role { Id = 1, Name = RoleNames.Admin.ToString() },
+            new Role { Id = 2, Name = RoleNames.Manager.ToString() },
+            new Role { Id = 3, Name = RoleNames.User.ToString() }
         );
 
         modelBuilder.Entity<User>(entity =>

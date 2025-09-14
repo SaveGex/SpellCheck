@@ -1,26 +1,25 @@
 ﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
-using DbManagerApi.Services.Abstractions;
-using DbManagerApi.Services.ModuleServices;
-using DbManagerApi.Services.UserServices;
 using FluentResults;
-using Infrastructure;
-using Infrastructure.Models;
-using Infrastructure.Models.ModelsDTO;
+using DomainData;
+using DomainData.Models;
+using DomainData.Models.ModelsDTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MR.AspNetCore.Pagination;
+using Application.Interfaces;
+using DomainData.Records;
 
 namespace DbManagerApi.Controllers;
 
 [ApiController]
-[Authorize(Roles = $"{RoleNames.Admin}, {RoleNames.Manager}")]
+[Authorize(Roles = $"{nameof(RoleNames.Admin)}, {nameof(RoleNames.Manager)}")]
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private UserServiceCursor UserService { get; set; }
-    public UsersController(SpellTestDbContext context, IPaginationService paginationService)
+    private IUserService UserService { get; set; }
+    public UsersController(IUserService userService)
     {
-        UserService = new UserServiceCursor(context, paginationService);
+        UserService = userService;
     }
 
     [AllowAnonymous]
@@ -28,13 +27,17 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<UserResponseDTO>> AddUser([FromBody] UserCreateDTO dto)
     {
-        Result<UserResponseDTO> result = await UserService.CreateEntityAsync(dto);
-        if (result.IsSuccess)
+        UserResponseDTO result;
+        try
         {
-            return Ok(result.Value);
+            result = await UserService.CreateUserAsync(dto);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
 
-        return BadRequest(result.Errors);
+        return Ok(result);
     }
 
     [HttpGet]
@@ -46,14 +49,18 @@ public class UsersController : ControllerBase
         [FromQuery] int? userId,
         [FromQuery] bool? reverse)
     {
-        var result = await UserService.GetKeysetPaginationAsync(after, propName, limit, userId, reverse);
-        if (result.IsSuccess)
+        KeysetPaginationAfterResult<UserResponseDTO> result;
+        try
         {
-            Response.Headers.Append("After", await UserService.GetCursorBase64StringAsync(result.Value.Data.LastOrDefault(), propName));
-            return Ok(result.Value);
+            result = await UserService.GetUsersKeysetPaginationAsync(after, propName, limit, userId, reverse);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
 
-        return BadRequest(result.Errors);
+        Response.Headers.Append("After", result.After);
+        return Ok(result);
     }
 
 
@@ -61,13 +68,17 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<UserResponseDTO>> GetUserById(int userId)
     {
-        Result<UserResponseDTO> result = await UserService.GetEntityByIdAsync(userId);
-        if (result.IsSuccess)
+        UserResponseDTO result;
+        try
         {
-            return Ok(result.Value);
+            result = await UserService.GetUserByIdAsync(userId);
+        }
+        catch(Exception ex)
+        {
+            return Ok(ex.Message);
         }
 
-        return BadRequest(result.Errors);
+        return BadRequest(result);
     }
 
     [HttpPut("{userId:int}")]
@@ -75,7 +86,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<UserResponseDTO>> UpdateUserById(int userId, [FromBody] UserUpdateDTO dto)
     {
-        Result<UserResponseDTO> result = await UserService.UpdateEntityAsync(dto, userId);
+        Result<UserResponseDTO> result = await UserService.UpdateUserAsync(dto);
         if (result.IsSuccess)
         {
             return Ok(result.Value);
@@ -88,7 +99,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<UserResponseDTO>> DeleteUserById(int userId)
     {
-        Result<UserResponseDTO> result = await UserService.DeleteEntityAsync(userId);
+        Result<UserResponseDTO> result = await UserService.DeleteUserAsync(userId);
         if (result.IsSuccess)
         {
             return Ok();

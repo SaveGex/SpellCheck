@@ -1,4 +1,4 @@
-﻿using Infrastructure.Models;
+﻿using DomainData.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DbManagerApi.Controllers.Filters.FilterAttributes;

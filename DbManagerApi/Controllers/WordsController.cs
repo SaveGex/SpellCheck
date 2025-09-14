@@ -1,12 +1,11 @@
 ﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
-using DbManagerApi.Services.WordServices;
-using DbManagerApi.Services.Abstractions;
 using FluentResults;
-using Infrastructure;
-using Infrastructure.Models.ModelsDTO;
+using DomainData;
+using DomainData.Models.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Infrastructure.Models;
+using DomainData.Models;
+using Application.Interfaces;
 
 namespace DbManagerApi.Controllers;
 
@@ -14,48 +13,43 @@ namespace DbManagerApi.Controllers;
 [Route("api/[controller]")]
 public class WordsController : ControllerBase
 {
-    private WordServiceAbstraction WordService { get; set; }
+    private IWordService WordService { get; set; }
 
-    public WordsController(SpellTestDbContext context)
+    public WordsController(IWordService wordService)
     {
-        WordService = new WordService(context);
-    }
-
-    [HttpGet]
-    [Authorize(Roles = $"{RoleNames.Manager}, {RoleNames.Admin}")]
-    [ProducesResponseType(typeof(IEnumerable<WordResponseDTO>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<WordResponseDTO>>> GetAllWords()
-    {
-        Result<IEnumerable<WordResponseDTO>> result = await WordService.GetAllEntitiesAsync();
-        if (result.IsFailed)
-        {
-            return BadRequest(result.Errors);
-        }
-        return Ok(result.Value);
+        WordService = wordService;
     }
 
     [HttpGet("{wordId:int}")]
     [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<WordResponseDTO>> GetWordById(int wordId)
     {
-        Result<WordResponseDTO> result = await WordService.GetEntityByIdAsync(wordId);
-        if (result.IsFailed)
+        WordResponseDTO result;
+        try
         {
-            return BadRequest(result.Errors);
+            result = await WordService.GetWordByIdAsync(wordId);
+        } 
+        catch (Exception ex) 
+        {
+            return BadRequest(ex.Message);
         }
-        return Ok(result.Value);
+        return Ok(result);
     }
 
     [HttpPost]
     [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<WordResponseDTO>> CreateWord([FromBody] WordCreateDTO dto)
     {
-        Result<WordResponseDTO> result = await WordService.CreateEntityAsync(dto);
-        if (result.IsFailed)
+        WordResponseDTO result;
+        try
         {
-            return BadRequest(result.Errors);
+            result = await WordService.CreateWordAsync(dto);
+        } 
+        catch (Exception ex) 
+        {
+            return BadRequest(ex.Message);
         }
-        return Ok(result.Value);
+        return Ok(result);
     }
 
 
@@ -64,12 +58,16 @@ public class WordsController : ControllerBase
     [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<WordResponseDTO>> UpdateWord([FromBody] WordUpdateDTO dto, int wordId)
     {
-        Result<WordResponseDTO> result = await WordService.UpdateEntityAsync(dto, wordId);
-        if (result.IsFailed)
+        WordResponseDTO result;
+        try
         {
-            return BadRequest(result.Errors);
+            result = await WordService.UpdateWordAsync(dto);
         }
-        return Ok(result.Value);
+        catch(Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        return Ok(result);
     }
 
     [HttpDelete("{wordId:int}")]
@@ -77,12 +75,16 @@ public class WordsController : ControllerBase
     [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<WordResponseDTO>> DeleteWord(int wordId)
     {
-        Result<WordResponseDTO> result = await WordService.DeleteEntityAsync(wordId);
-        if (result.IsFailed)
+        WordResponseDTO result;
+        try
         {
-            return BadRequest(result.Errors);
+            result = await WordService.DeleteWordAsync(wordId);
         }
-        return Ok(result.Value);
+        catch(Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        return Ok(result);
     }
 
 
@@ -90,11 +92,15 @@ public class WordsController : ControllerBase
     [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<WordResponseDTO>> GetWordsByModuleId(int moduleId)
     {
-        Result<IEnumerable<WordResponseDTO>> result = await WordService.GetWordsByModuleIdAsync(moduleId);
-        if (result.IsFailed)
+        IEnumerable<WordResponseDTO> result;
+        try
         {
-            return BadRequest(result.Errors);
+            result = await WordService.GetWordsByModuleIdAsync(moduleId);
         }
-        return Ok(result.Value);
+        catch (Exception ex) 
+        {
+            return BadRequest(ex.Message);
+        }
+        return Ok(result);
     }
 }

@@ -1,5 +1,5 @@
-﻿using DbManagerApi.Services.Interfaces;
-using Infrastructure.Models;
+﻿using Application.Interfaces;
+using DomainData.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
@@ -26,7 +26,7 @@ public class UserOwnershipFilter : IAsyncAuthorizationFilter
 
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        if (context.HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role).Any(c => c.Value == RoleNames.Admin || c.Value == RoleNames.Manager))
+        if (context.HttpContext.User.Claims.Where(c => c.Type == ClaimTypes.Role).Any(c => c.Value == RoleNames.Admin.ToString() || c.Value == RoleNames.Manager.ToString()))
         {
             return;
         }

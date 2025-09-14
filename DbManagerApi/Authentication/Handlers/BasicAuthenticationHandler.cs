@@ -1,5 +1,7 @@
-﻿using Infrastructure;
-using Infrastructure.Models;
+﻿using Application.Interfaces;
+using Application.Services;
+using DomainData;
+using DomainData.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -14,7 +16,7 @@ namespace DbManagerApi.Authentication.Handlers
 {
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
-        private readonly SpellTestDbContext _context;
+        private IUserService UserService { get; init; }
 
         private enum ContactType
         {
@@ -26,10 +28,10 @@ namespace DbManagerApi.Authentication.Handlers
         public BasicAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
-            SpellTestDbContext dbContext)
+            IUserService userService)
             : base(options, logger, encoder)
         {
-            _context = dbContext;
+            UserService = userService;
         }
 
 
@@ -78,8 +80,8 @@ namespace DbManagerApi.Authentication.Handlers
 
             var user = (GetContactType(login)) switch
             {
-                ContactType.Email => await _context.Users.Include(u => u.Roles).SingleOrDefaultAsync(u => u.Email == login),
-                ContactType.Phone => await _context.Users.Include(u => u.Roles).SingleOrDefaultAsync(u => u.Number == login),
+                ContactType.Email => await UserService.GetByEmailIncludeRolesAsync(login),
+                ContactType.Phone => await UserService.GetByPhoneIncludeRolesAsync(login),
                 _ => null
             };
             if (user == null || user.Password != password)

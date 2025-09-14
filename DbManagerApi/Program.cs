@@ -1,13 +1,16 @@
+using Application.Interfaces;
+using Application.Profiles;
+using Application.Services;
+using AutoMapper;
 using DbManagerApi.Authentication.Handlers;
 using DbManagerApi.JsonPatchSample;
 using DbManagerApi.Services;
-using DbManagerApi.Services.Abstracts;
-using DbManagerApi.Services.Interfaces;
-using DbManagerApi.Services.ModuleServices;
-using Infrastructure;
+using Infrastructure.DI;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Scalar.AspNetCore;
+
+const string LuckyLicenseKeyWord = "Lucky Penny License Key";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,13 +23,28 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
+
 builder.Services.AddAuthentication("BasicAuthentication")
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<SpellTestDbContext>();
-builder.Services.AddScoped<IEntityOwnershipService, EntityOwnershipService>();
+//---add services---
+builder.Services.AddTransient<IEntityOwnershipService, EntityOwnershipService>();
+builder.Services.AddTransient<IModuleService, ModuleService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IWordService, WordService>();
+
+//---add repositories to the DI container ---
+builder.Services.AddInfrastructure();
+
+//---add auto mapper ---
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<MappingProfile>();
+    cfg.LicenseKey = builder.Configuration.GetValue<string>(LuckyLicenseKeyWord);
+});
+
 builder.Services.AddPagination();
 
 var app = builder.Build();
