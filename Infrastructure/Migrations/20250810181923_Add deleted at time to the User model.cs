@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace DomainData.Migrations
 {
     /// <inheritdoc />
     public partial class AdddeletedattimetotheUsermodel : Migration

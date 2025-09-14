@@ -4,7 +4,7 @@
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Infrastructure.Migrations
+namespace DomainData.Migrations
 {
     /// <inheritdoc />
     public partial class UpdateUsermodel : Migration
