@@ -1,9 +1,9 @@
 ﻿
 using Application.Interfaces;
+using Application.ModelsDTO;
 using AutoMapper;
 using DomainData.Interfaces;
 using DomainData.Models;
-using DomainData.Models.ModelsDTO;
 
 namespace Application.Services;
 

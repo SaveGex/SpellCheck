@@ -1,5 +1,4 @@
-﻿using DomainData.Models;
-using DomainData.Models.ModelsDTO;
+﻿using Application.ModelsDTO;
 using DomainData.Records;
 
 namespace Application.Interfaces;

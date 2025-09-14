@@ -1,7 +1,6 @@
-﻿using DomainData.Models;
-using DomainData.Models.ModelsDTO;
+﻿using Application.ModelsDTO;
+using DomainData.Models;
 using DomainData.Records;
-using MR.AspNetCore.Pagination;
 
 namespace Application.Interfaces;
 

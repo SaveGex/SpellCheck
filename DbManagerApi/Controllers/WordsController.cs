@@ -1,11 +1,7 @@
 ﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
-using FluentResults;
-using DomainData;
-using DomainData.Models.ModelsDTO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using DomainData.Models;
 using Application.Interfaces;
+using Application.ModelsDTO;
 
 namespace DbManagerApi.Controllers;
 

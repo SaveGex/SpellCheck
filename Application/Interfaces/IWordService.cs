@@ -1,8 +1,5 @@
-﻿using DomainData.Models;
-using DomainData.Models.ModelsDTO;
-using FluentResults;
-using MR.AspNetCore.Pagination;
-using MR.EntityFrameworkCore.KeysetPagination;
+﻿
+using Application.ModelsDTO;
 
 namespace Application.Interfaces;
 

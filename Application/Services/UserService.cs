@@ -1,12 +1,10 @@
 ﻿
 using Application.Interfaces;
+using Application.ModelsDTO;
 using AutoMapper;
 using DomainData.Interfaces;
 using DomainData.Models;
-using DomainData.Models.ModelsDTO;
 using DomainData.Records;
-using Microsoft.EntityFrameworkCore;
-using MR.AspNetCore.Pagination;
 
 namespace Application.Services;
 

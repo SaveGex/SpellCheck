@@ -1,7 +1,7 @@
 ﻿
+using Application.ModelsDTO;
 using AutoMapper;
 using DomainData.Models;
-using DomainData.Models.ModelsDTO;
 using DomainData.Records;
 
 namespace Application.Profiles;
