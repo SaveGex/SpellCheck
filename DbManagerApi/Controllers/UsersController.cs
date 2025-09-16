@@ -8,6 +8,7 @@ using MR.AspNetCore.Pagination;
 using Application.Interfaces;
 using DomainData.Records;
 using Application.ModelsDTO;
+using DbManagerApi.Services.UserServices;
 
 namespace DbManagerApi.Controllers;
 
@@ -106,5 +107,23 @@ public class UsersController : ControllerBase
         }
 
         return BadRequest(result.Errors);
+    }
+
+    [HttpPost("{userId:int}/roles/{roleId:int}")]
+    [Authorize(Roles = $"{nameof(RoleNames.Admin)}")]
+    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UserResponseDTO>> AttachRoleToUser(int userId, int roleId)
+    {
+        UserResponseDTO result = await UserService.AddRoleToUserAsync(userId, roleId);
+        return Ok(result);
+    }
+
+    [HttpDelete("{userId:int}/roles/{roleId:int}")]
+    [Authorize(Roles = $"{nameof(RoleNames.Admin)}")]
+    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UserResponseDTO>> DettachRoleToUser(int userId, int roleId)
+    {
+        UserResponseDTO result = await UserService.RemoveRoleFromUserAsync(userId, roleId);
+        return Ok(result);
     }
 }

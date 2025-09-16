@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddTransient<IWordRepository, WordRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IModelRepository, ModelRepository>();
+        services.AddTransient<IRoleRepository, RoleRepository>();
 
         return services;
     }

@@ -1,4 +1,5 @@
 ﻿
+using Application.Interfaces;
 using Application.ModelsDTO;
 using AutoMapper;
 using DomainData.Models;
@@ -26,6 +27,9 @@ public class MappingProfile : Profile
         CreateMap<WordCreateDTO, Word>();
         CreateMap<WordUpdateDTO, Word>();
 
+        CreateMap<Role, RoleResponseDTO>();
+        CreateMap<RoleCreateDTO, Role>();
+        CreateMap<RoleUpdateDTO, Role>();
 
     }
 }

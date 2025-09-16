@@ -7,8 +7,6 @@ public class UserResponseDTO
 
     public string Username { get; set; } = null!;
 
-    public string Password { get; set; } = null!;
-
     public string? Number { get; set; }
 
     public string? Email { get; set; }
@@ -16,5 +14,5 @@ public class UserResponseDTO
     public DateTime CreatedAt { get; set; }
     public DateTime? DeletedAt { get; set; }
 
-    //public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
+    public virtual ICollection<RoleResponseDTO> Roles { get; set; } = new List<RoleResponseDTO>();
 }

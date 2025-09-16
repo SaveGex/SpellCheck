@@ -8,8 +8,7 @@ using DomainData.Interfaces;
 using DomainData.Records;
 
 namespace DbManagerApi.Services.UserServices;
-//Task AddRoleToUserAsync(int userId, int roleId);
-//Task RemoveRoleFromUserAsync(int userId, int roleId);
+
 public sealed class UserRepository : IUserRepository
 {
     private readonly SpellTestDbContext _context;
@@ -20,6 +19,55 @@ public sealed class UserRepository : IUserRepository
     {
         _context = context;
         _paginationService = paginationService;
+    }
+
+
+    public async Task<User> RemoveRoleToUserAsync(int userId, int roleId)
+    {
+        User? user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            throw new Exception("User does not found by this Id");
+        }
+
+        Role? role = await _context.Roles.FindAsync(roleId);
+        if (role == null)
+        {
+            throw new Exception("Role does not found by this id");
+        }
+
+        if (user.Roles.Contains(role))
+        {
+            throw new Exception($"User already have {role.Name} role");
+        }
+
+        user.Roles.Add(role);
+        await _context.SaveChangesAsync();
+        return user;
+    }
+
+    public async Task<User> RemoveRoleFromUserAsync(int userId, int roleId)
+    {
+        User? user = await _context.Users.FindAsync(userId);
+        if (user == null)
+        {
+            throw new Exception("User does not found by this Id");
+        }
+
+        Role? role = await _context.Roles.FindAsync(roleId);
+        if (role == null)
+        {
+            throw new Exception("Role does not found by this id");
+        }
+
+        if (user.Roles.Contains(role))
+        {
+            throw new Exception($"User already have {role.Name} role");
+        }
+
+        user.Roles.Remove(role);
+        await _context.SaveChangesAsync();
+        return user;
     }
 
 
@@ -68,7 +116,9 @@ public sealed class UserRepository : IUserRepository
 
         if (Id is not null)
         {
-            query = query.Where(m => m.Id == Id);
+            query = query
+                .Include(u => u.Roles)
+                .Where(m => m.Id == Id);
         }
 
         KeysetQueryModel queryModel = new KeysetQueryModel()
@@ -130,7 +180,10 @@ public sealed class UserRepository : IUserRepository
 
     public async Task<User> GetUserByIdAsync(int userId)
     {
-        User? user = await _context.Users.FindAsync(userId);
+        User? user = await _context.Users
+            .Include(u => u.Roles)
+            .Where(u => u.Id  == userId)
+            .SingleOrDefaultAsync();
         if (user is null)
         {
             throw new Exception("User does not found.");

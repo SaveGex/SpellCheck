@@ -1,4 +1,5 @@
 ﻿using DomainData.Attributes;
+using DomainData.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.ModelsDTO;
@@ -12,4 +13,5 @@ public class UserUpdateDTO
     public string Password { get; set; } = null!;
     public string? Number { get; set; }
     public string? Email { get; set; }
+
 }

@@ -5,6 +5,7 @@ using AutoMapper;
 using DbManagerApi.Authentication.Handlers;
 using DbManagerApi.JsonPatchSample;
 using DbManagerApi.Services;
+using DomainData.Models;
 using Infrastructure.DI;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
@@ -34,6 +35,7 @@ builder.Services.AddTransient<IEntityOwnershipService, EntityOwnershipService>()
 builder.Services.AddTransient<IModuleService, ModuleService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IWordService, WordService>();
+builder.Services.AddTransient<IRoleService, RoleService>();
 
 //---add repositories to the DI container ---
 builder.Services.AddInfrastructure();

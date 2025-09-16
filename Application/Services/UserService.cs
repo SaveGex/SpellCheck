@@ -23,6 +23,19 @@ public class UserService : IUserService
     }
 
 
+    public async Task<UserResponseDTO> AddRoleToUserAsync(int userId, int roleId)
+    {
+        User result = await UserRepository.RemoveRoleToUserAsync(userId, roleId);
+        return Mapper.Map<UserResponseDTO>(result);
+    }
+
+    public async Task<UserResponseDTO> RemoveRoleFromUserAsync(int userId, int roleId)
+    {
+        User result = await UserRepository.RemoveRoleToUserAsync(userId, roleId);
+        return Mapper.Map<UserResponseDTO>(result);
+    }
+
+
     public async Task<User?> GetByEmailIncludeRolesAsync(string email)
     {
         return await UserRepository.GetByEmailIncludeRolesAsync(email);

@@ -6,6 +6,9 @@ namespace DomainData.Interfaces
     public interface IUserRepository
     {
 
+        Task<User> RemoveRoleToUserAsync(int userId, int roleId);
+        Task<User> RemoveRoleFromUserAsync(int userId, int roleId);
+
         Task<User?> GetByEmailIncludeRolesAsync(string email);
         Task<User?> GetByPhoneIncludeRolesAsync(string phone);
 

@@ -6,6 +6,8 @@ namespace Application.Interfaces;
 
 public interface IUserService
 {
+    Task<UserResponseDTO> AddRoleToUserAsync(int userId, int roleId);
+    Task<UserResponseDTO> RemoveRoleFromUserAsync(int userId, int roleId);
 
     Task<User?> GetByEmailIncludeRolesAsync(string email);
     Task<User?> GetByPhoneIncludeRolesAsync(string phone);
@@ -15,4 +17,5 @@ public interface IUserService
     Task<UserResponseDTO> GetUserByIdAsync(int userId);
     Task<UserResponseDTO> UpdateUserAsync(UserUpdateDTO dto);
     Task<UserResponseDTO> DeleteUserAsync(int userId);
+
 }
