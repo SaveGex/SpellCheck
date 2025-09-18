@@ -1,6 +1,5 @@
 ﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
 using FluentResults;
-using DomainData;
 using DomainData.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,12 +7,11 @@ using MR.AspNetCore.Pagination;
 using Application.Interfaces;
 using DomainData.Records;
 using Application.ModelsDTO;
-using DbManagerApi.Services.UserServices;
 
 namespace DbManagerApi.Controllers;
 
 [ApiController]
-[Authorize(Roles = $"{nameof(RoleNames.Admin)}, {nameof(RoleNames.Manager)}")]
+[Authorize(Roles = $"{nameof(RoleNames.Admin)}")]
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {

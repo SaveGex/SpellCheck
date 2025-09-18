@@ -31,5 +31,9 @@ public class MappingProfile : Profile
         CreateMap<RoleCreateDTO, Role>();
         CreateMap<RoleUpdateDTO, Role>();
 
+        CreateMap<DifficultyLevel, DifficultyLevelResponseDTO>();
+        CreateMap<DifficultyLevelCreateDTO, DifficultyLevel>();
+        CreateMap<DifficultyLevelUpdateDTO, DifficultyLevel>();
+
     }
 }

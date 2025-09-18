@@ -20,6 +20,7 @@ public static class DependencyInjection
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IModelRepository, ModelRepository>();
         services.AddTransient<IRoleRepository, RoleRepository>();
+        services.AddTransient<IDifficultyLevelRepository, DifficultyLevelRepository>();
 
         return services;
     }

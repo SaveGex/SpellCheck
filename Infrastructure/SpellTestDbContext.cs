@@ -44,9 +44,17 @@ public partial class SpellTestDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Difficul__3214EC071CD4BFD4");
 
-            entity.ToTable("Difficulty_Level");
+            entity.ToTable("Difficulty_Level"); 
+            entity.ToTable(t => t.HasCheckConstraint("CHK_Difficulty_Range", "Difficulty >= 1 AND Difficulty <= 6"));
 
             entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Name).IsRequired();
+
+            entity.Property(e => e.Difficulty).IsRequired();
+            entity.Property(e => e.Difficulty);
+            
+
+            entity.HasIndex(e => e.Difficulty, "IX_Difficulty_Level");
         });
 
         modelBuilder.Entity<File>(entity =>

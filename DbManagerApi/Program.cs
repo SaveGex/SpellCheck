@@ -36,6 +36,7 @@ builder.Services.AddTransient<IModuleService, ModuleService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IWordService, WordService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddTransient<IDifficultyLevelService, DifficultyLevelService>();
 
 //---add repositories to the DI container ---
 builder.Services.AddInfrastructure();
