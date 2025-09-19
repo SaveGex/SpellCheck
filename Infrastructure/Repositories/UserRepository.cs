@@ -186,7 +186,7 @@ public sealed class UserRepository : IUserRepository
             .SingleOrDefaultAsync();
         if (user is null)
         {
-            throw new Exception("User does not found.");
+            throw new Exception("User does not found by this Id...");
         }
 
         return user;

@@ -35,5 +35,11 @@ public class MappingProfile : Profile
         CreateMap<DifficultyLevelCreateDTO, DifficultyLevel>();
         CreateMap<DifficultyLevelUpdateDTO, DifficultyLevel>();
 
+        CreateMap<Friend, FriendResponseDTO>();
+        CreateMap<FriendCreateDTO, Friend>();
+        CreateMap<FriendUpdateDTO, Friend>();
+
+        CreateMap<KeysetPaginationAfterResult<Friend>, KeysetPaginationAfterResult<FriendResponseDTO>>();
+
     }
 }

@@ -72,7 +72,7 @@ public class UserService : IUserService
         User? user = await UserRepository.GetUserByIdAsync(userId);
         if (user is null)
         {
-            throw new ArgumentNullException($"user by id {userId} does not found.");
+            throw new Exception($"user by id {userId} does not found.");
         }
         UserResponseDTO dto = Mapper.Map<UserResponseDTO>(
             await UserRepository.DeleteUserAsync(user));
@@ -85,7 +85,7 @@ public class UserService : IUserService
         User? user = await UserRepository.GetUserByIdAsync(userId);
         if (user is null)
         {
-            throw new ArgumentNullException($"user by id {userId} does not found.");
+            throw new Exception($"user by id {userId} does not found.");
         }
         UserResponseDTO dto = Mapper.Map<UserResponseDTO>(user);
         return dto;

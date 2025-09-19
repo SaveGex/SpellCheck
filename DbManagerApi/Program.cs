@@ -37,6 +37,7 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IWordService, WordService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IDifficultyLevelService, DifficultyLevelService>();
+builder.Services.AddTransient<IFriendsService, FriendsService>();
 
 //---add repositories to the DI container ---
 builder.Services.AddInfrastructure();
@@ -71,6 +72,7 @@ app.MapControllers().RequireAuthorization(policy =>
 {
     policy.AuthenticationSchemes.Add("BasicAuthentication");
     policy.RequireAuthenticatedUser();
+    policy.RequireRole(nameof(RoleNames.User), nameof(RoleNames.Manager), nameof(RoleNames.Admin));
 });
 
 app.Run();
