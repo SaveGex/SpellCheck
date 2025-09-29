@@ -4,7 +4,6 @@ using AutoMapper;
 using DomainData.Interfaces;
 using DomainData.Models;
 using DomainData.Records;
-using System.ComponentModel;
 
 namespace Application.Services;
 
@@ -25,7 +24,7 @@ public class FriendsService
 
     public async Task<FriendResponseDTO> AddFriendAsync(FriendCreateDTO dto)
     {
-                
+
         await UserRepository.GetUserByIdAsync(dto.ToIndividualId);
         await UserRepository.GetUserByIdAsync(dto.FromIndividualId);
 

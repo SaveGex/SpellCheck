@@ -1,6 +1,4 @@
 ﻿using DomainData.Models;
-using FluentResults;
-using Microsoft.EntityFrameworkCore;
 
 namespace DomainData.Interfaces;
 

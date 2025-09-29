@@ -1,8 +1,7 @@
 ﻿using Application.Interfaces;
-using DomainData;
+using DomainData.Interfaces;
 using Microsoft.EntityFrameworkCore.Metadata;
 using System.Reflection;
-using DomainData.Interfaces;
 namespace DbManagerApi.Services;
 
 public class EntityOwnershipService : IEntityOwnershipService

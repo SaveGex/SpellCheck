@@ -1,6 +1,6 @@
-﻿using DomainData;
-using DomainData.Interfaces;
+﻿using DomainData.Interfaces;
 using DomainData.Models;
+using Infrastructure.DB;
 using System.Data;
 
 namespace Infrastructure.Repositories;
@@ -34,7 +34,7 @@ public class RoleRepository : IRoleRepository
     public async Task<Role> DeleteRoleAsync(int roleId)
     {
         Role? role = await Context.Roles.FindAsync(roleId);
-        if(role is null)
+        if (role is null)
         {
             throw new Exception("Role by this id does not found");
         }

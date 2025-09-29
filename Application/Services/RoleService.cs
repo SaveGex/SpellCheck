@@ -41,7 +41,7 @@ public class RoleService : IRoleService
     public async Task<IEnumerable<RoleResponseDTO>> GetRolesAsync()
     {
         List<RoleResponseDTO> result = new List<RoleResponseDTO>();
-        foreach(Role el in await RoleRepository.GetRolesAsync())
+        foreach (Role el in await RoleRepository.GetRolesAsync())
         {
             result.Add(
                 Mapper.Map<RoleResponseDTO>(el));

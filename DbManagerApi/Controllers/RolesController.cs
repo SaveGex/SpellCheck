@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ModelsDTO;
-using DomainData.Models;
+using DomainData.Roles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +26,7 @@ public class RolesController : ControllerBase
         RoleResponseDTO result = await RoleService.CreateRoleAsync(dto);
         return Ok(result);
     }
-    
+
     [HttpGet]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<RoleResponseDTO>>> GetAllRoles()

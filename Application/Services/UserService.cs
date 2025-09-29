@@ -25,13 +25,13 @@ public class UserService : IUserService
 
     public async Task<UserResponseDTO> AddRoleToUserAsync(int userId, int roleId)
     {
-        User result = await UserRepository.RemoveRoleToUserAsync(userId, roleId);
+        User result = await UserRepository.AttachRoleToUserAsync(userId, roleId);
         return Mapper.Map<UserResponseDTO>(result);
     }
 
     public async Task<UserResponseDTO> RemoveRoleFromUserAsync(int userId, int roleId)
     {
-        User result = await UserRepository.RemoveRoleToUserAsync(userId, roleId);
+        User result = await UserRepository.AttachRoleToUserAsync(userId, roleId);
         return Mapper.Map<UserResponseDTO>(result);
     }
 
@@ -47,26 +47,7 @@ public class UserService : IUserService
         return await UserRepository.GetByPhoneIncludeRolesAsync(phone);
     }
 
-    
-    public async Task<UserResponseDTO> CreateUserAsync(UserCreateDTO dto)
-    {
-        if (string.IsNullOrEmpty(dto.Number) && string.IsNullOrEmpty(dto.Email))
-            throw new Exception("You must provide either Number or Email.");
 
-        bool exists = await UserRepository.ExistsAsync(
-            dto.Number, dto.Email);
-
-        if (exists)
-            throw new Exception("User already exists.");
-
-        User createdUser = await UserRepository.CreateUserAsync(
-            Mapper.Map<User>(dto));
-
-        return Mapper.Map<UserResponseDTO>(createdUser);
-        
-    }
-
-    
     public async Task<UserResponseDTO> DeleteUserAsync(int userId)
     {
         User? user = await UserRepository.GetUserByIdAsync(userId);
@@ -102,9 +83,14 @@ public class UserService : IUserService
 
     public async Task<UserResponseDTO> UpdateUserAsync(UserUpdateDTO dto)
     {
-        if(await UserRepository.ExistsAsync(dto.Number, dto.Email))
+        if (await UserRepository.ExistsAsync(dto.Number, dto.Email))
         {
             throw new Exception("User with such email or number does not found");
+        }
+
+        if (dto.Password.Length < 4)
+        {
+            throw new Exception("Password must be at least 4 characters long.");
         }
 
         User? user = Mapper.Map<User>(dto);

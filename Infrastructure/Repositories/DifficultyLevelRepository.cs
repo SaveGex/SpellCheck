@@ -1,7 +1,6 @@
-﻿
-using DomainData;
-using DomainData.Interfaces;
+﻿using DomainData.Interfaces;
 using DomainData.Models;
+using Infrastructure.DB;
 
 namespace Infrastructure.Repositories;
 

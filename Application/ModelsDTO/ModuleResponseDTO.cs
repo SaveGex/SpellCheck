@@ -1,5 +1,4 @@
-﻿using Application.ModelsDTO;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.ModelsDTO;

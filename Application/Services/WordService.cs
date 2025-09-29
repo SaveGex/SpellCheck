@@ -48,7 +48,7 @@ public class WordService : IWordService
     public async Task<IEnumerable<WordResponseDTO>> GetWordsByModuleIdAsync(int moduleId)
     {
         List<WordResponseDTO> wordsDTO = new List<WordResponseDTO>();
-        foreach(Word word in await WordRepository.GetWordsByModuleIdAsync(moduleId))
+        foreach (Word word in await WordRepository.GetWordsByModuleIdAsync(moduleId))
         {
             wordsDTO.Add(Mapper.Map<WordResponseDTO>(word));
         }
