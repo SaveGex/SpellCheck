@@ -1,11 +1,8 @@
 ﻿using Application.Interfaces;
 using Application.ModelsDTO;
-using DomainData.Models;
 using DomainData.Roles;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 
 namespace DbManagerApi.Controllers
 {
@@ -65,7 +62,7 @@ namespace DbManagerApi.Controllers
             {
                 result = await ClientService.UpdateClientByIdAsync(destId, clientRequestDTO);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }

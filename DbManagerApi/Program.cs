@@ -7,10 +7,13 @@ using DbManagerApi.JsonPatchSample;
 using DbManagerApi.Services;
 using DomainData.Roles;
 using Infrastructure.DI;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
-using System.Configuration;
 using System.Text;
 
 const string LuckyLicenseKeyWord = "Lucky Penny License Key";
@@ -26,36 +29,69 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = "Bearer";
-})
+
+builder.Services.AddAuthentication()
     .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null) // remained for debugging purposes
     .AddJwtBearer("Bearer", options =>
     {
-        var JwtKeySecretWord = builder.Configuration["JWT:KeyWord"];
-        if (JwtKeySecretWord is null)
-            throw new ConfigurationErrorsException("JWT KeyWord is not configured");
-
-        var JwtKeySecretValue = builder.Configuration.GetValue<string>(JwtKeySecretWord);
-        if (JwtKeySecretValue is null)
-            throw new ConfigurationErrorsException("JWT Key is not configured");
-
         options.TokenValidationParameters = new()
         {
             ValidateIssuer = true,
-            ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidIssuer = builder.Configuration["JWT:Issuer"],
+            ValidAudience = builder.Configuration["JWT:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(
-                    JwtKeySecretValue
-            ))
+                    builder.Configuration.GetJWTSigningSecretValue()
+            )),
+            ValidateAudience = false // do it later, manually
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var db = context.HttpContext.RequestServices
+                    .GetRequiredService<Infrastructure.DB.SpellTestDbContext>();
+
+                var audiences = await db.Clients
+                    .Select(c => c.URL)
+                    .ToListAsync();
+
+                // fetch all 'aud' claims
+                var jwtAudiences = context.Principal?
+                    .FindAll("aud")
+                    .Select(c => c.Value)
+                    .ToList();
+
+                if (jwtAudiences == null || !jwtAudiences.Any())
+                {
+                    context.Fail("Token has no audience claim.");
+                    return;
+                }
+
+                // check if at least one matches
+                if (!jwtAudiences.Any(aud => audiences.Contains(aud)))
+                {
+                    context.Fail("Token audience not allowed.");
+                }
+            }
         };
     });
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddAuthorization(auth =>
+{
+    auth.AddPolicy("Bearer", policy =>
+    {
+        policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
+        policy.RequireAuthenticatedUser();
+    });
+    auth.AddPolicy("BasicAuthentication", policy =>
+    {
+        policy.AddAuthenticationSchemes("BasicAuthentication");
+        policy.RequireAuthenticatedUser();
+    });
+});
 
 //---add repositories to the DI container ---
 builder.Services.AddInfrastructure();
@@ -102,7 +138,7 @@ app.UseHttpsRedirection();
 app.MapControllers().RequireAuthorization(policy =>
 {
     policy.AddAuthenticationSchemes("BasicAuthentication", "Bearer");
-    
+
     policy.RequireAuthenticatedUser();
     policy.RequireRole(nameof(RoleNames.User), nameof(RoleNames.Manager), nameof(RoleNames.Admin));
 });

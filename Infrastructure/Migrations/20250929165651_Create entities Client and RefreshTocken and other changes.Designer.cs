@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DomainData.Migrations
 {
     [DbContext(typeof(SpellTestDbContext))]
-    [Migration("20250928174153_Create entities Client and RefreshTocken and other changes")]
+    [Migration("20250929165651_Create entities Client and RefreshTocken and other changes")]
     partial class CreateentitiesClientandRefreshTockenandotherchanges
     {
         /// <inheritdoc />
@@ -55,12 +55,11 @@ namespace DomainData.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasColumnName("Name");
 
-                    b.Property<Guid>("Secret")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Secret")
+                        .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("Secret")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnType("nvarchar(512)")
+                        .HasColumnName("Secret");
 
                     b.Property<string>("URL")
                         .IsRequired()

@@ -52,12 +52,11 @@ namespace DomainData.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasColumnName("Name");
 
-                    b.Property<Guid>("Secret")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Secret")
+                        .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("Secret")
-                        .HasDefaultValueSql("(newid())");
+                        .HasColumnType("nvarchar(512)")
+                        .HasColumnName("Secret");
 
                     b.Property<string>("URL")
                         .IsRequired()

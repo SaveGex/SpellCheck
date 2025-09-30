@@ -4,7 +4,6 @@ using DomainData.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 namespace Infrastructure.Services;
 
 public class ClientCacheService : IClientCacheService
@@ -27,7 +26,7 @@ public class ClientCacheService : IClientCacheService
     public async Task<Client?> GetClientByClientIdAsync(string clientId)
     {
         string cacheKey = ClientCacheKeyPrefix + clientId;
-        if(MemoryCache.TryGetValue(cacheKey, out Client? cachedClient))
+        if (MemoryCache.TryGetValue(cacheKey, out Client? cachedClient))
         {
             return cachedClient;
         }

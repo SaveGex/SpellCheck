@@ -69,7 +69,7 @@ namespace Application.Services
                 _ => throw new Exception("You must provide either Email or Number."),
             };
 
-            if(PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password) == PasswordVerificationResult.Failed)
+            if (PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password) == PasswordVerificationResult.Failed)
             {
                 throw new Exception("Invalid password.");
             }
@@ -101,7 +101,7 @@ namespace Application.Services
 
             RefreshToken existingToken = await RefreshTokenRepository.GetRefreshTokenIncludeUserAndRolesByRefreshTokenAndClientIdAsync(refreshToken, client.Id);
 
-            if(existingToken.IsActive == false)
+            if (existingToken.IsActive == false)
             {
                 throw new Exception("Refresh token is not active.");
             }

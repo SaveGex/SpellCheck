@@ -1,9 +1,9 @@
-﻿    using DomainData.Models;
+﻿using DomainData.Models;
 
-    namespace Application.Interfaces
+namespace Application.Interfaces
+{
+    public interface IClientCacheService
     {
-        public interface IClientCacheService
-        {
-            Task<Client?> GetClientByClientIdAsync(string clientId);
-        }
+        Task<Client?> GetClientByClientIdAsync(string clientId);
     }
+}

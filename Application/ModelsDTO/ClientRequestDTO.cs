@@ -1,6 +1,5 @@
-﻿
-using DomainData.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 
 namespace Application.ModelsDTO;
@@ -16,5 +15,17 @@ public class ClientRequestDTO
     [MaxLength(512, ErrorMessage = "Client URL cannot be longer than 512 characters.")]
     public string URL { get; set; } = null!;
 
-    private Guid Secret { get; set; } = Guid.NewGuid();
+    [JsonIgnore]
+    public string Secret { get; private set; } = null!; // base64 encoded client secret
+
+    public ClientRequestDTO() => Init();
+
+
+    private void Init()
+    {
+        byte[] secretBytes = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(secretBytes);
+        Secret = Convert.ToBase64String(secretBytes);
+    }
 }

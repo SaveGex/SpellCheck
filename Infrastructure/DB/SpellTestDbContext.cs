@@ -1,6 +1,5 @@
 ﻿using DomainData.Models;
 using DomainData.Roles;
-using Infrastructure.DB.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using File = DomainData.Models.File;
@@ -233,10 +232,9 @@ public partial class SpellTestDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(256)
                 .HasColumnName("Name");
-            
+
             entity.Property(e => e.Secret)
                 .IsRequired()
-                .HasDefaultValueSql("(newid())")
                 .HasColumnName("Secret");
 
             entity.Property(e => e.URL)
@@ -259,7 +257,7 @@ public partial class SpellTestDbContext : DbContext
         modelBuilder.Entity<RefreshToken>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_RefreshTokens_Id");
-            
+
             entity.Property(e => e.Id)
                 .HasColumnName("Id")
                 .ValueGeneratedOnAdd();
@@ -282,10 +280,10 @@ public partial class SpellTestDbContext : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("smalldatetime")
                 .HasColumnName("Created_At");
-            
+
             entity.Property(e => e.CreatedByIp)
-                .HasMaxLength(16*3) // ipv6 max length
-                .HasColumnName("Created_By_Ip");                
+                .HasMaxLength(16 * 3) // ipv6 max length
+                .HasColumnName("Created_By_Ip");
 
             entity.HasOne(rt => rt.AssociatedUser)
                 .WithMany(u => u.RefreshTokens)

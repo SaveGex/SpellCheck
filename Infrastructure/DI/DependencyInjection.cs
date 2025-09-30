@@ -21,7 +21,7 @@ public static class DependencyInjection
         // DbContext
         services.AddSingleton<SoftDeleteInterceptor>();
 
-        services.AddDbContext<SpellTestDbContext>((sp, options) => 
+        services.AddDbContext<SpellTestDbContext>((sp, options) =>
             options.AddInterceptors()
                 .AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>())
         );
@@ -36,7 +36,7 @@ public static class DependencyInjection
         services.AddTransient<IFriendsRepository, FriendsRepository>();
         services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddTransient<IClientRepository, ClientRepository>();
-        
+
         // Other
         services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
 

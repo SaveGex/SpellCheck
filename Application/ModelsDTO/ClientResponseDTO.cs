@@ -1,5 +1,4 @@
-﻿using DomainData.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Application.ModelsDTO;
 
@@ -14,7 +13,7 @@ public class ClientResponseDTO
     public string Name { get; set; } = null!;
     [Required(ErrorMessage = "Client Secret is required")]
     [MaxLength(512, ErrorMessage = "Client Secret cannot be longer than 512 characters.")]
-    public Guid Secret { get; set; }
+    public string Secret { get; set; } = null!; // base64 encoded client secret
     [Required(ErrorMessage = "Client URL is required")]
     [MaxLength(512, ErrorMessage = "Client URL cannot be longer than 512 characters.")]
     public string URL { get; set; } = null!;

@@ -14,7 +14,7 @@ public partial class User : ISoftDeletableTimeStamp
     public string? LastName { get; set; }
     private string _username = null!;
     [StringLength(maximumLength: 32, ErrorMessage = "Username cannot be longer than 32 characters.")]
-    public string Username 
+    public string Username
     {
         get => _username;
         set
@@ -24,12 +24,11 @@ public partial class User : ISoftDeletableTimeStamp
                 FirstName = value;
             }
             if (value is not null)
-            { 
-                _username = value; 
+            {
+                _username = value;
             }
-        } 
+        }
     }
-
     [Required]
     public string PasswordHash { get; set; } = null!;
     [StringLength(maximumLength: 25, ErrorMessage = "Number cannot be longer than 25 characters.")]

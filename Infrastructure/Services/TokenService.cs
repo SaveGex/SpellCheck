@@ -1,6 +1,7 @@
 ﻿using DomainData.Interfaces;
 using DomainData.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Protocols.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -26,10 +27,18 @@ public class TokenService : ITokenService
 
     public Task<string> GenerateAccessTokenAsync(User user, IEnumerable<string> roleNames, out Guid jwtId, Client client)
     {
+        string? JwtTokenKeyValue;
         var tokenHandler = new JwtSecurityTokenHandler();
+        {
+            var JwtTokenKeyWord = Configuration["JWT:KeyWord"];
+            if (string.IsNullOrWhiteSpace(JwtTokenKeyWord))
+                throw new InvalidConfigurationException("JWT KeyWord is not configured");
 
-        var keyBytes = Encoding.UTF8.GetBytes(client.Secret.ToString());
-        var key = new SymmetricSecurityKey(keyBytes);
+            JwtTokenKeyValue = Configuration.GetValue<string>(JwtTokenKeyWord);
+            if (string.IsNullOrWhiteSpace(JwtTokenKeyValue))
+                throw new InvalidConfigurationException("JWT Key is not configured");
+        }
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtTokenKeyValue));
 
         jwtId = Guid.NewGuid();
 
@@ -52,8 +61,6 @@ public class TokenService : ITokenService
             loginCredentialsClaim,
 
             new Claim(JwtRegisteredClaimNames.Iss, issuer),
-
-            new Claim(JwtRegisteredClaimNames.Aud, client.URL),
 
             new Claim("client_id", client.ClientId)
         };
@@ -79,7 +86,6 @@ public class TokenService : ITokenService
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
         return Task.FromResult(tokenHandler.WriteToken(token));
-
     }
 
     public Task<RefreshToken> GenerateRefreshTokenAsync(int userId, Guid jwtId, Client client, string ipAddress)

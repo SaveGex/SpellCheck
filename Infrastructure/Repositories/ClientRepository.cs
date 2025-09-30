@@ -19,7 +19,7 @@ public class ClientRepository : IClientRepository
         Client? result = await Context.Clients
             .AsNoTracking()
             .SingleOrDefaultAsync(c => c.ClientId == clientId && c.IsActive);
-        if(result == null)
+        if (result == null)
         {
             throw new Exception($"Client with clientId '{clientId}' does not found");
         }

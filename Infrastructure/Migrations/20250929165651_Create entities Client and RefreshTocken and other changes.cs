@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -44,7 +43,7 @@ namespace DomainData.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ClientId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    Secret = table.Column<Guid>(type: "uniqueidentifier", maxLength: 512, nullable: false, defaultValueSql: "(newid())"),
+                    Secret = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
                     URL = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
                     Created_At = table.Column<DateTime>(type: "smalldatetime", nullable: false, defaultValueSql: "(getdate())")

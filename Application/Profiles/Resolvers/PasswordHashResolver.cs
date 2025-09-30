@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Application.Profiles.Resolvers;
 
-public class PasswordHashResolver : 
+public class PasswordHashResolver :
     IValueResolver<UserLoginDTO, User, string>,
     IValueResolver<UserRegisterDTO, User, string>,
     IValueResolver<UserUpdateDTO, User, string>

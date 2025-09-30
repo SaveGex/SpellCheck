@@ -27,7 +27,7 @@ public class ClientService : IClientService
     public async Task<IEnumerable<ClientResponseDTO>> GetAllClientsAsync()
     {
         List<ClientResponseDTO> result = new List<ClientResponseDTO>();
-        foreach(var item in await ClientRepository.GetAllClientsAsync())
+        foreach (var item in await ClientRepository.GetAllClientsAsync())
         {
             result.Add(
                 Mapper.Map<ClientResponseDTO>(item));
