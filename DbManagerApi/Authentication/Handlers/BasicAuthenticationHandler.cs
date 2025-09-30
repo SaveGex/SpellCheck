@@ -1,9 +1,7 @@
 ﻿using Application.Interfaces;
-using Application.Services;
-using DomainData;
 using DomainData.Models;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Headers;
@@ -18,6 +16,8 @@ namespace DbManagerApi.Authentication.Handlers
     {
         private IUserService UserService { get; init; }
 
+        private IPasswordHasher<User> PasswordHasher { get; init; }
+
         private enum ContactType
         {
             Unknown,
@@ -28,12 +28,14 @@ namespace DbManagerApi.Authentication.Handlers
         public BasicAuthenticationHandler(IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
-            IUserService userService)
+            IUserService userService,
+            IPasswordHasher<User> passwordHasher)
             : base(options, logger, encoder)
         {
             UserService = userService;
+            PasswordHasher = passwordHasher;
         }
-
+        //Sentree
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
@@ -84,7 +86,7 @@ namespace DbManagerApi.Authentication.Handlers
                 ContactType.Phone => await UserService.GetByPhoneIncludeRolesAsync(login),
                 _ => null
             };
-            if (user == null || user.Password != password)
+            if (user == null || PasswordHasher.VerifyHashedPassword(user, user.PasswordHash, password) == PasswordVerificationResult.Failed)
             {
                 return AuthenticateResult.Fail("Invalid sign in data");
             }

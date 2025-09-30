@@ -1,5 +1,4 @@
-﻿using Application.ModelsDTO;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Application.ModelsDTO;

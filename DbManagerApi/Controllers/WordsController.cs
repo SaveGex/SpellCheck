@@ -1,7 +1,7 @@
-﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
-using Microsoft.AspNetCore.Mvc;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.ModelsDTO;
+using DbManagerApi.Controllers.Filters.FilterAttributes;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DbManagerApi.Controllers;
 
@@ -24,8 +24,8 @@ public class WordsController : ControllerBase
         try
         {
             result = await WordService.GetWordByIdAsync(wordId);
-        } 
-        catch (Exception ex) 
+        }
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
@@ -40,8 +40,8 @@ public class WordsController : ControllerBase
         try
         {
             result = await WordService.CreateWordAsync(dto);
-        } 
-        catch (Exception ex) 
+        }
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
@@ -59,7 +59,7 @@ public class WordsController : ControllerBase
         {
             result = await WordService.UpdateWordAsync(dto);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
@@ -76,7 +76,7 @@ public class WordsController : ControllerBase
         {
             result = await WordService.DeleteWordAsync(wordId);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
@@ -93,7 +93,7 @@ public class WordsController : ControllerBase
         {
             result = await WordService.GetWordsByModuleIdAsync(moduleId);
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }

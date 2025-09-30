@@ -1,7 +1,4 @@
-﻿using DomainData.Models;
-using System.ComponentModel;
-
-namespace Application.ModelsDTO
+﻿namespace Application.ModelsDTO
 {
     public class RoleResponseDTO
     {

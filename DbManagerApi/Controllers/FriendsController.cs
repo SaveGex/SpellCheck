@@ -4,7 +4,6 @@ using DbManagerApi.Controllers.Filters.FilterAttributes;
 using DomainData.Models;
 using DomainData.Records;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Security.Claims;
 
 namespace DbManagerApi.Controllers

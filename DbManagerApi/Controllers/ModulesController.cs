@@ -1,9 +1,9 @@
-﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
+﻿using Application.Interfaces;
+using Application.ModelsDTO;
+using DbManagerApi.Controllers.Filters.FilterAttributes;
+using DomainData.Records;
 using Microsoft.AspNetCore.Mvc;
 using MR.AspNetCore.Pagination;
-using Application.Interfaces;
-using DomainData.Records;
-using Application.ModelsDTO;
 
 namespace DbManagerApi.Controllers;
 
@@ -33,7 +33,7 @@ public class ModulesController : ControllerBase
         {
             result = await ModuleService.GetModulesKeysetPaginationAsync(after, propName, limit, moduleId, reverse, wordsIncludeNumber);
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
@@ -50,7 +50,8 @@ public class ModulesController : ControllerBase
         try
         {
             result = await ModuleService.GetModuleByIdAsync(moduleId);
-        }catch (Exception ex) 
+        }
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
@@ -67,7 +68,7 @@ public class ModulesController : ControllerBase
         {
             result = await ModuleService.CreateModuleAsync(dto);
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
@@ -85,7 +86,7 @@ public class ModulesController : ControllerBase
         {
             result = await ModuleService.UpdateModuleAsync(dto);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }

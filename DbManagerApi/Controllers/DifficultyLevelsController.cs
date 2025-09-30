@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.ModelsDTO;
-using DomainData.Models;
+using DomainData.Roles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +13,7 @@ namespace DbManagerApi.Controllers
     {
         IDifficultyLevelService DifficultyLevelService { get; init; }
 
-        public DifficultyLevelsController(IDifficultyLevelService difficultyLevelService) 
+        public DifficultyLevelsController(IDifficultyLevelService difficultyLevelService)
         {
             DifficultyLevelService = difficultyLevelService;
         }

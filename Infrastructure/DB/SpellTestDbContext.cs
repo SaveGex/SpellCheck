@@ -1,8 +1,9 @@
 ﻿using DomainData.Models;
+using DomainData.Roles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using File = DomainData.Models.File;
-namespace DomainData;
+namespace Infrastructure.DB;
 
 public partial class SpellTestDbContext : DbContext
 {
@@ -29,6 +30,10 @@ public partial class SpellTestDbContext : DbContext
 
     public virtual DbSet<Word> Words { get; set; }
 
+    public virtual DbSet<Client> Clients { get; set; }
+
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
@@ -44,7 +49,7 @@ public partial class SpellTestDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Difficul__3214EC071CD4BFD4");
 
-            entity.ToTable("Difficulty_Level"); 
+            entity.ToTable("Difficulty_Level");
             entity.ToTable(t => t.HasCheckConstraint("CHK_Difficulty_Range", "Difficulty >= 1 AND Difficulty <= 6"));
 
             entity.Property(e => e.Name).HasMaxLength(100);
@@ -52,7 +57,7 @@ public partial class SpellTestDbContext : DbContext
 
             entity.Property(e => e.Difficulty).IsRequired();
             entity.Property(e => e.Difficulty);
-            
+
 
             entity.HasIndex(e => e.Difficulty, "IX_Difficulty_Level");
         });
@@ -180,9 +185,11 @@ public partial class SpellTestDbContext : DbContext
             entity.HasMany(u => u.UserModules)
                 .WithMany(m => m.Users);
 
+            entity.HasMany(u => u.RefreshTokens)
+                .WithOne(rt => rt.AssociatedUser);
+
             entity.Property(e => e.Email).HasMaxLength(254);
             entity.Property(e => e.Number).HasMaxLength(25);
-            entity.Property(e => e.Password).HasMaxLength(256);
             entity.Property(e => e.Username).HasMaxLength(32);
         });
 
@@ -213,6 +220,85 @@ public partial class SpellTestDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Words_Users");
         });
+
+        modelBuilder.Entity<Client>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Clients_Id");
+            entity.Property(e => e.Id)
+                .HasColumnName("Id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(256)
+                .HasColumnName("Name");
+
+            entity.Property(e => e.Secret)
+                .IsRequired()
+                .HasColumnName("Secret");
+
+            entity.Property(e => e.URL)
+                .IsRequired()
+                .HasMaxLength(512);
+
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true);
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Created_At");
+
+            entity.HasMany(c => c.RefreshTokens)
+                .WithOne(rt => rt.AssociatedClient);
+
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_RefreshTokens_Id");
+
+            entity.Property(e => e.Id)
+                .HasColumnName("Id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Token)
+                .IsRequired()
+                .HasMaxLength(512)
+                .HasColumnName("Token");
+
+            entity.Property(e => e.ExpiresAt)
+                .IsRequired()
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Expires_At");
+
+            entity.Property(e => e.IsRevoked)
+                .HasDefaultValue(false)
+                .HasColumnName("Is_Revoked");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("smalldatetime")
+                .HasColumnName("Created_At");
+
+            entity.Property(e => e.CreatedByIp)
+                .HasMaxLength(16 * 3) // ipv6 max length
+                .HasColumnName("Created_By_Ip");
+
+            entity.HasOne(rt => rt.AssociatedUser)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(rt => rt.AssociatedUserId);
+
+            entity.HasOne(rt => rt.AssociatedClient)
+                .WithMany(c => c.RefreshTokens)
+                .HasForeignKey(rt => rt.AssociatedClientId);
+
+        });
+
+
+        modelBuilder.Entity<User>()
+            .HasQueryFilter(u => u.DeletedAt == null);
+
 
         OnModelCreatingPartial(modelBuilder);
     }

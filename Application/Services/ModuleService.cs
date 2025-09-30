@@ -33,7 +33,7 @@ public class ModuleService : IModuleService
     public async Task<ModuleResponseDTO> DeleteModuleAsync(int moduleId)
     {
         Module? module = await ModuleRepository.GetModuleByIdAsync(moduleId);
-        if(module == null)
+        if (module == null)
         {
             throw new Exception($"module with such id: {moduleId} does not found");
         }

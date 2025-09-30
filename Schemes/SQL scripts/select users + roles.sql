@@ -2,7 +2,7 @@ USE [spell_test_db]
 
 SELECT TOP (1000) u.Id
       ,u.Username
-      ,u.Password
+      ,u.PasswordHash
       ,u.Number
       ,u.Email
       ,u.Created_At

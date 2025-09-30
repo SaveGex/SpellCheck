@@ -1,6 +1,4 @@
 ﻿using Application.ModelsDTO;
-using FluentResults;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
@@ -12,7 +10,7 @@ namespace DbManagerApi.Controllers.Filters.FilterAttributes
     /// Checks such models as <see cref="FriendUpdateDTO"/> <see cref="FriendCreateDTO"/> and their properties of ids' users
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-    public class RestrictOfCreateFriendshipsAttribute 
+    public class RestrictOfCreateFriendshipsAttribute
         : ActionFilterAttribute
     {
         public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -20,7 +18,7 @@ namespace DbManagerApi.Controllers.Filters.FilterAttributes
             object? friend = null;
             foreach (var item in context.ActionArguments.Values)
             {
-                if(item is FriendCreateDTO or FriendUpdateDTO)
+                if (item is FriendCreateDTO or FriendUpdateDTO)
                 {
                     friend = item;
                     break;
@@ -36,7 +34,7 @@ namespace DbManagerApi.Controllers.Filters.FilterAttributes
                 .Where(c => c.Type == ClaimTypes.NameIdentifier)
                 .FirstOrDefault();
 
-            if (idClaim == null) 
+            if (idClaim == null)
             {
                 context.Result = new BadRequestObjectResult("User is authenticated but don't have any Id");
                 return base.OnActionExecutionAsync(context, next);
@@ -44,7 +42,8 @@ namespace DbManagerApi.Controllers.Filters.FilterAttributes
 
             int userId = int.Parse(idClaim.Value);
 
-            if (friend is FriendCreateDTO friendCreate) {
+            if (friend is FriendCreateDTO friendCreate)
+            {
                 if (friendCreate.ToIndividualId != userId && friendCreate.FromIndividualId != userId)
                 {
                     context.Result = new BadRequestObjectResult("User cannot create relationship between other users");

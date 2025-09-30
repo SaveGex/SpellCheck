@@ -1,16 +1,27 @@
-﻿using DomainData.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace DomainData.Attributes;
 
+/// <summary>
+/// Can use any <see cref="TModel"/> which contains properties "Number" and "Email". <br/>
+/// </summary>
+/// <typeparam name="TModel">Type of Model which will be checks on number or email is not null</typeparam>
 [AttributeUsage(AttributeTargets.Class)]
-public class RequireNumberOrEmail : ValidationAttribute
+public class RequireNumberOrEmail<TModel> : ValidationAttribute
 {
+    public Type ModelType { get; init; } = typeof(TModel);
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        if (value is User user)
+
+        if (value is TModel model)
         {
-            if (!string.IsNullOrWhiteSpace(user.Number) || !string.IsNullOrWhiteSpace(user.Email))
+            PropertyInfo numberProp = model.GetType().GetProperty("Number")
+                ?? throw new InvalidOperationException("Model does not contain a 'Number' property.");
+            PropertyInfo emailProp = model.GetType().GetProperty("Email")
+                ?? throw new InvalidOperationException("Model does not contain an 'Email' property.");
+            if (
+                !string.IsNullOrWhiteSpace(numberProp.GetValue(model)?.ToString()) || !string.IsNullOrWhiteSpace(emailProp.GetValue(model)?.ToString()))
             {
                 return ValidationResult.Success;
             }

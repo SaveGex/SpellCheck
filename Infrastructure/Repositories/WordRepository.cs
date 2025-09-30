@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using FluentResults;
-using DomainData;
-using DomainData.Models;
-using Microsoft.EntityFrameworkCore;
 using DomainData.Interfaces;
+using DomainData.Models;
+using Infrastructure.DB;
+using Microsoft.EntityFrameworkCore;
 
 namespace DbManagerApi.Services.WordServices;
 

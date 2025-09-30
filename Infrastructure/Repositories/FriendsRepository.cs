@@ -1,7 +1,7 @@
-﻿using DomainData;
-using DomainData.Interfaces;
+﻿using DomainData.Interfaces;
 using DomainData.Models;
 using DomainData.Records;
+using Infrastructure.DB;
 using Microsoft.EntityFrameworkCore;
 using MR.AspNetCore.Pagination;
 using MR.EntityFrameworkCore.KeysetPagination;
@@ -67,7 +67,7 @@ public class FriendsRepository
 
         query = query
             .Where(f => f.ToIndividualId == userId || f.FromIndividualId == userId);
-        
+
 
         KeysetQueryModel queryModel = new KeysetQueryModel()
         {

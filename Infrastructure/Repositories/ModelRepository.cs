@@ -1,6 +1,5 @@
-﻿
-using DomainData;
-using DomainData.Interfaces;
+﻿using DomainData.Interfaces;
+using Infrastructure.DB;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Infrastructure.Repositories;

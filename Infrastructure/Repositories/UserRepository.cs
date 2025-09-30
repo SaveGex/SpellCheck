@@ -1,18 +1,19 @@
-﻿using DomainData;
+﻿using DomainData.Interfaces;
 using DomainData.Models;
+using DomainData.Records;
+using DomainData.Roles;
+using Infrastructure.DB;
 using Microsoft.EntityFrameworkCore;
 using MR.AspNetCore.Pagination;
 using MR.EntityFrameworkCore.KeysetPagination;
 using System.Linq.Expressions;
-using DomainData.Interfaces;
-using DomainData.Records;
 
 namespace DbManagerApi.Services.UserServices;
 
 public sealed class UserRepository : IUserRepository
 {
     private readonly SpellTestDbContext _context;
-    
+
     private IPaginationService _paginationService;
 
     public UserRepository(SpellTestDbContext context, IPaginationService paginationService)
@@ -22,7 +23,7 @@ public sealed class UserRepository : IUserRepository
     }
 
 
-    public async Task<User> RemoveRoleToUserAsync(int userId, int roleId)
+    public async Task<User> AttachRoleToUserAsync(int userId, int roleId)
     {
         User? user = await _context.Users.FindAsync(userId);
         if (user == null)
@@ -100,8 +101,8 @@ public sealed class UserRepository : IUserRepository
             .AnyAsync(u => (number != null ? u.Number == number : false)
                         || (email != null ? u.Email == email : false));
     }
-    
-    
+
+
     public async Task<KeysetPaginationAfterResult<User>> GetUsersKeysetPaginationAsync(string? after, string? propName, int? limit, int? Id, bool? reverse)
     {
         {
@@ -147,7 +148,7 @@ public sealed class UserRepository : IUserRepository
 
         return new KeysetPaginationAfterResult<User>(
             await GetCursorBase64StringAsync(
-                result.Data.LastOrDefault()), 
+                result.Data.LastOrDefault()),
             result);
     }
 
@@ -161,7 +162,7 @@ public sealed class UserRepository : IUserRepository
         }
 
         user = await AttachRoleAsync(user, role);
-        
+
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -171,7 +172,7 @@ public sealed class UserRepository : IUserRepository
 
     public async Task<User> DeleteUserAsync(User user)
     {
-        user.DeletedAt = DateTime.UtcNow;
+        _context.Users.Remove(user);
         await _context.SaveChangesAsync();
 
         return user;
@@ -182,7 +183,7 @@ public sealed class UserRepository : IUserRepository
     {
         User? user = await _context.Users
             .Include(u => u.Roles)
-            .Where(u => u.Id  == userId)
+            .Where(u => u.Id == userId)
             .SingleOrDefaultAsync();
         if (user is null)
         {

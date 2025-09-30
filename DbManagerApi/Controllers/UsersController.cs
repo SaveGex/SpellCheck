@@ -1,12 +1,12 @@
-﻿using DbManagerApi.Controllers.Filters.FilterAttributes;
+﻿using Application.Interfaces;
+using Application.ModelsDTO;
+using DbManagerApi.Controllers.Filters.FilterAttributes;
+using DomainData.Records;
+using DomainData.Roles;
 using FluentResults;
-using DomainData.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MR.AspNetCore.Pagination;
-using Application.Interfaces;
-using DomainData.Records;
-using Application.ModelsDTO;
 
 namespace DbManagerApi.Controllers;
 
@@ -19,24 +19,6 @@ public class UsersController : ControllerBase
     public UsersController(IUserService userService)
     {
         UserService = userService;
-    }
-
-    [AllowAnonymous]
-    [HttpPost]
-    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
-    public async Task<ActionResult<UserResponseDTO>> AddUser([FromBody] UserCreateDTO dto)
-    {
-        UserResponseDTO result;
-        try
-        {
-            result = await UserService.CreateUserAsync(dto);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-
-        return Ok(result);
     }
 
     [HttpGet]
@@ -72,7 +54,7 @@ public class UsersController : ControllerBase
         {
             result = await UserService.GetUserByIdAsync(userId);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return Ok(ex.Message);
         }

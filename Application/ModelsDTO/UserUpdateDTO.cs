@@ -1,10 +1,9 @@
 ﻿using DomainData.Attributes;
-using DomainData.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.ModelsDTO;
 
-[RequireNumberOrEmail]
+[RequireNumberOrEmail<UserRegisterDTO>]
 public class UserUpdateDTO
 {
     [Required(ErrorMessage = "Username is required.")]

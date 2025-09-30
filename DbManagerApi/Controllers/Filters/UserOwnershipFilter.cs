@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using DomainData.Models;
+using DomainData.Roles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;

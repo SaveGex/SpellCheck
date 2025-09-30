@@ -1,6 +1,7 @@
 ﻿
 using Application.Interfaces;
 using Application.ModelsDTO;
+using Application.Profiles.Resolvers;
 using AutoMapper;
 using DomainData.Models;
 using DomainData.Records;
@@ -12,8 +13,15 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<User, UserResponseDTO>();
-        CreateMap<UserCreateDTO, User>();
-        CreateMap<UserUpdateDTO, User>();
+        CreateMap<UserLoginDTO, User>()
+            .ForMember(dest => dest.PasswordHash,
+                options => options.MapFrom<PasswordHashResolver>());
+        CreateMap<UserRegisterDTO, User>()
+            .ForMember(dest => dest.PasswordHash,
+                options => options.MapFrom<PasswordHashResolver>());
+        CreateMap<UserUpdateDTO, User>()
+            .ForMember(dest => dest.PasswordHash,
+                options => options.MapFrom<PasswordHashResolver>());
 
         CreateMap<KeysetPaginationAfterResult<User>, KeysetPaginationAfterResult<UserResponseDTO>>();
 
@@ -41,5 +49,7 @@ public class MappingProfile : Profile
 
         CreateMap<KeysetPaginationAfterResult<Friend>, KeysetPaginationAfterResult<FriendResponseDTO>>();
 
+        CreateMap<Client, ClientResponseDTO>();
+        CreateMap<ClientRequestDTO, Client>();
     }
 }

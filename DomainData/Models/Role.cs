@@ -10,10 +10,3 @@ public class Role
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();
 }
-
-public enum RoleNames
-{
-    User,
-    Manager,
-    Admin,
-}

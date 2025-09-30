@@ -1,13 +1,11 @@
-﻿using DbManagerApi.Services.WordServices;
-using DomainData;
+﻿using DomainData.Interfaces;
+using DomainData.Models;
+using DomainData.Records;
+using Infrastructure.DB;
 using Microsoft.EntityFrameworkCore;
 using MR.AspNetCore.Pagination;
 using MR.EntityFrameworkCore.KeysetPagination;
 using System.Linq.Expressions;
-using DomainData.Interfaces;
-using DomainData.Models;
-using DomainData.Records;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace DbManagerApi.Services.ModuleServices;
 
@@ -25,9 +23,9 @@ public sealed class ModuleRepository : IModuleRepository
     }
 
 
-    public async Task<bool> AnyAsync(Module module) 
+    public async Task<bool> AnyAsync(Module module)
         => await _context.Modules.FindAsync(module) is not null;
-    
+
 
     private Task<string> GetCursorBase64StringAsync(Module? cursorElement)
     {
