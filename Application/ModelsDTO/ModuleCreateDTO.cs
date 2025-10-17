@@ -10,9 +10,8 @@ public class ModuleCreateDTO
     public Guid? Identifier { get; set; }
     [Required(ErrorMessage = "Module name is required."), Key]
     public string Name { get; set; } = null!;
-    [Required(ErrorMessage = "AuthorId is required."), Key]
     public string? Description { get; set; }
-
+    [Required(ErrorMessage = "AuthorId is required."), Key]
     public int AuthorId { get; set; }
     public ICollection<WordCreateDTO>? Words { get; set; } = new List<WordCreateDTO>();
 

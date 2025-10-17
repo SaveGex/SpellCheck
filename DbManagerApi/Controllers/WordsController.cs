@@ -33,6 +33,7 @@ public class WordsController : ControllerBase
     }
 
     [HttpPost]
+    [BindingAuthorId<WordCreateDTO>]
     [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<WordResponseDTO>> CreateWord([FromBody] WordCreateDTO dto)
     {
@@ -51,6 +52,7 @@ public class WordsController : ControllerBase
 
     [HttpPut("{wordId:int}")]
     [UserOwnership("wordId", "Words")]
+    [BindingAuthorId<WordUpdateDTO>]
     [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<WordResponseDTO>> UpdateWord([FromBody] WordUpdateDTO dto, int wordId)
     {

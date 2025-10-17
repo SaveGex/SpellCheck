@@ -23,8 +23,8 @@ public sealed class ModuleRepository : IModuleRepository
     }
 
 
-    public async Task<bool> AnyAsync(Module module)
-        => await _context.Modules.FindAsync(module) is not null;
+    public async Task<bool> AnyAsync(Guid identifier)
+        => await _context.Modules.AnyAsync(m => m.Identifier == identifier);
 
 
     private Task<string> GetCursorBase64StringAsync(Module? cursorElement)

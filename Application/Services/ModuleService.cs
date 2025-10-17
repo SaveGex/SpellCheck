@@ -22,7 +22,7 @@ public class ModuleService : IModuleService
     public async Task<ModuleResponseDTO> CreateModuleAsync(ModuleCreateDTO dto)
     {
         Module? module = Mapper.Map<Module>(dto);
-        if (await ModuleRepository.AnyAsync(module))
+        if (await ModuleRepository.AnyAsync(module.Identifier))
         {
             throw new Exception("module with this identifiers already exists");
         }

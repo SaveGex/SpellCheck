@@ -6,7 +6,7 @@ namespace DomainData.Interfaces;
 
 public interface IModuleRepository
 {
-    Task<bool> AnyAsync(Module module);
+    Task<bool> AnyAsync(Guid identifier);
 
 
     Task<Module> CreateModuleAsync(Module module);

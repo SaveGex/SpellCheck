@@ -60,6 +60,7 @@ public class ModulesController : ControllerBase
 
 
     [HttpPost]
+    [BindingAuthorId<ModuleCreateDTO>]
     [ProducesResponseType(typeof(ModuleResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<ModuleResponseDTO>> CreateModule([FromBody] ModuleCreateDTO dto)
     {
@@ -78,6 +79,7 @@ public class ModulesController : ControllerBase
 
     [HttpPut("{moduleId:int}")]
     [UserOwnership("moduleId", "Modules")]
+    [BindingAuthorId<ModuleUpdateDTO>]
     [ProducesResponseType(typeof(ModuleResponseDTO), StatusCodes.Status200OK)]
     public async Task<ActionResult<ModuleResponseDTO>> UpdateModule([FromBody] ModuleUpdateDTO dto, int moduleId)
     {

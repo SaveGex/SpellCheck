@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System;
 using System.Text;
 
 const string LuckyLicenseKeyWord = "Lucky Penny License Key";
@@ -118,10 +119,20 @@ builder.Services.AddTransient<PasswordHashResolver>();
 builder.Services.AddPagination();
 builder.Services.AddMemoryCache();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+});
+
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
