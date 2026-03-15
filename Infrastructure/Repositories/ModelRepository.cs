@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Infrastructure.Repositories;
 
-public class ModelRepository : IModelRepository
+internal class ModelRepository : IModelRepository
 {
     private SpellTestDbContext Context { get; init; }
     public ModelRepository(SpellTestDbContext context)

@@ -4,6 +4,7 @@ using Application.ModelsDTO;
 using AutoMapper;
 using DomainData.Interfaces;
 using DomainData.Models;
+using DomainData.Roles;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services
@@ -33,7 +34,7 @@ namespace Application.Services
         }
 
 
-        public async Task<UserResponseDTO> RegisterUserAsync(UserRegisterDTO dto)
+        public async Task<UserResponseDTO> RegisterUserAsync(UserRegisterDTO dto, params RoleNames[] roles)
         {
             if (string.IsNullOrEmpty(dto.Number) && string.IsNullOrEmpty(dto.Email))
             {
@@ -54,7 +55,7 @@ namespace Application.Services
             }
 
             User createdUser = await UserRepository.CreateUserAsync(
-                Mapper.Map<User>(dto));
+                Mapper.Map<User>(dto), roles);
 
             return Mapper.Map<UserResponseDTO>(createdUser);
 

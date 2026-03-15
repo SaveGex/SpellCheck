@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Infrastructure.Repositories;
 
-public class RoleRepository : IRoleRepository
+internal class RoleRepository : IRoleRepository
 {
     public SpellTestDbContext Context { get; init; }
 

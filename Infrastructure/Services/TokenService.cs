@@ -1,7 +1,6 @@
 ﻿using DomainData.Interfaces;
 using DomainData.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Protocols.Configuration;
+using Infrastructure.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,40 +9,28 @@ using System.Text;
 
 namespace Infrastructure.Services;
 
-public class TokenService : ITokenService
+internal class TokenService : ITokenService
 {
-    private IConfiguration Configuration { get; init; }
+    public JwtConfigOptions JwtConfig { get; set; }
 
-    public TokenService(IConfiguration configuration)
+    public TokenService(JwtConfigOptions jwtConfig)
     {
-        Configuration = configuration;
+        JwtConfig = jwtConfig;
     }
 
     public int GetAccessTokenExperationMinutes()
-    {
-        int result = int.TryParse(Configuration["JWT:AccessTokenExpirationMinutes"], out var val) ? val : throw new InvalidOperationException("JWT:AccessTokenExpirationMinutes must be configured");
-        return result;
-    }
+        => (int)JwtConfig.AccessTokenExpirationInSeconds / 60;
 
     public Task<string> GenerateAccessTokenAsync(User user, IEnumerable<string> roleNames, out Guid jwtId, Client client)
     {
         string? JwtTokenKeyValue;
         var tokenHandler = new JwtSecurityTokenHandler();
         {
-            var JwtTokenKeyWord = Configuration["JWT:KeyWord"];
-            if (string.IsNullOrWhiteSpace(JwtTokenKeyWord))
-                throw new InvalidConfigurationException("JWT KeyWord is not configured");
-
-            JwtTokenKeyValue = Configuration.GetValue<string>(JwtTokenKeyWord);
-            if (string.IsNullOrWhiteSpace(JwtTokenKeyValue))
-                throw new InvalidConfigurationException("JWT Key is not configured");
+            JwtTokenKeyValue = JwtConfig.SecretKey;
         }
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtTokenKeyValue));
 
         jwtId = Guid.NewGuid();
-
-        string issuer = Configuration.GetValue<string>("JWT:Issuer") ?? throw new InvalidOperationException("JWT:Issuer must be configured.");
-        int accessTokenExpirationMinutes = int.TryParse(Configuration["JWT:AccessTokenExpirationMinutes"], out var val) ? val : 15;
 
         Claim loginCredentialsClaim = user switch
         {
@@ -60,7 +47,7 @@ public class TokenService : ITokenService
 
             loginCredentialsClaim,
 
-            new Claim(JwtRegisteredClaimNames.Iss, issuer),
+            new Claim(JwtRegisteredClaimNames.Iss, JwtConfig.Issuer),
 
             new Claim("client_id", client.ClientId)
         };
@@ -73,11 +60,11 @@ public class TokenService : ITokenService
         {
             Subject = new ClaimsIdentity(claims),
 
-            Expires = DateTime.UtcNow.AddMinutes(accessTokenExpirationMinutes),
+            Expires = DateTime.UtcNow.AddMinutes(GetAccessTokenExperationMinutes()),
 
             SigningCredentials = creds,
 
-            Issuer = issuer,
+            Issuer = JwtConfig.Issuer,
 
             Audience = client.URL
         };
@@ -94,15 +81,13 @@ public class TokenService : ITokenService
         var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomBytes);
 
-        var refreshTokenExpirationDays = int.TryParse(Configuration["JWT:RefreshTokenExpirationDays"], out var val) ? val : throw new InvalidOperationException("JWT:RefreshTokenExpirationDays must be configured");
-
         return Task.FromResult(new RefreshToken
         {
             Token = Convert.ToBase64String(randomBytes),
 
             JwtId = jwtId,
 
-            ExpiresAt = DateTime.UtcNow.AddDays(refreshTokenExpirationDays),
+            ExpiresAt = DateTime.UtcNow.AddDays(JwtConfig.RefreshTokenExpirationInSeconds / 60 / 60 / 24),
 
             CreatedAt = DateTime.UtcNow,
 

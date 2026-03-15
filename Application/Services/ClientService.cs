@@ -19,6 +19,12 @@ public class ClientService : IClientService
 
     public async Task<ClientResponseDTO> AddClientAsync(ClientRequestDTO clientRequest)
     {
+        bool exists = await ClientRepository.ExistsAsync(clientRequest.ClientId);
+        if (exists)
+        {
+            throw new Exception("This client is already exists.");
+        }
+
         Client addedClient = await ClientRepository.AddClientAsync(
             Mapper.Map<Client>(clientRequest));
         return Mapper.Map<ClientResponseDTO>(addedClient);

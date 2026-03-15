@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories;
 
-public class FriendsRepository
+internal class FriendsRepository
     : IFriendsRepository
 {
     SpellTestDbContext Context { get; init; }

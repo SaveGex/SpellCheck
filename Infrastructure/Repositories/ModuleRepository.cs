@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace DbManagerApi.Services.ModuleServices;
 
-public sealed class ModuleRepository : IModuleRepository
+internal sealed class ModuleRepository : IModuleRepository
 {
 
     private readonly SpellTestDbContext _context;

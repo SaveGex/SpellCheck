@@ -2,6 +2,7 @@
 using Application.ModelsDTO;
 
 namespace Application.Interfaces;
+
 public interface IRoleService
 {
     Task<RoleResponseDTO> CreateRoleAsync(RoleCreateDTO dto);

@@ -8,7 +8,7 @@ namespace DbManagerApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = $"{nameof(RoleNames.Manager)}, ${nameof(RoleNames.Admin)}")]
+    [Authorize(Roles = $"{nameof(RoleNames.Manager)}, {nameof(RoleNames.Admin)}")]
     public class DifficultyLevelsController : ControllerBase
     {
         IDifficultyLevelService DifficultyLevelService { get; init; }
@@ -19,21 +19,20 @@ namespace DbManagerApi.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(DifficultyLevelResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(DifficultyLevelResponseDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<DifficultyLevelResponseDTO>> CreateDifficultyLevel(
             [FromBody] DifficultyLevelCreateDTO dto)
         {
-            DifficultyLevelResponseDTO result;
             try
             {
-                result = await DifficultyLevelService.CreateLevelAsync(dto);
+                var result = await DifficultyLevelService.CreateLevelAsync(dto);
+                return StatusCode(StatusCodes.Status201Created, result);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-
-            return Ok(result);
         }
 
 
@@ -74,20 +73,19 @@ namespace DbManagerApi.Controllers
 
 
         [HttpDelete("{levelId:int}")]
-        [ProducesResponseType(typeof(DifficultyLevelResponseDTO), StatusCodes.Status200OK)]
-        public async Task<ActionResult<DifficultyLevelResponseDTO>> DeleteLevelAsync(
-            int levelId)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeleteLevelAsync(int levelId)
         {
-            DifficultyLevelResponseDTO result;
             try
             {
-                result = await DifficultyLevelService.DeleteLevelAsync(levelId);
+                await DifficultyLevelService.DeleteLevelAsync(levelId);
+                return NoContent();
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            return Ok(result);
         }
     }
 }

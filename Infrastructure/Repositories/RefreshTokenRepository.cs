@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class RefreshTokenRepository : IRefreshTokenRepository
+internal class RefreshTokenRepository : IRefreshTokenRepository
 {
     public SpellTestDbContext Context { get; init; }
 

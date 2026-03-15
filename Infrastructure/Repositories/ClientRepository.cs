@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories;
 
-public class ClientRepository : IClientRepository
+internal class ClientRepository : IClientRepository
 {
     public SpellTestDbContext Context { get; init; }
 
@@ -46,5 +46,16 @@ public class ClientRepository : IClientRepository
         await Context.SaveChangesAsync();
 
         return existingClient;
+    }
+
+    public Task<bool> ExistsAsync(Client client)
+        => ExistsAsync(client.ClientId);
+
+    public async Task<bool> ExistsAsync(string clientId)
+    {
+        var client = await Context.Clients.SingleOrDefaultAsync(
+            client => client.ClientId == clientId);
+        return client != null;
+
     }
 }

@@ -35,20 +35,20 @@ namespace DbManagerApi.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(ClientResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ClientResponseDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<ClientResponseDTO>> CreateClient(
             [FromBody] ClientRequestDTO clientRequestDTO)
         {
-            ClientResponseDTO result;
             try
             {
-                result = await ClientService.AddClientAsync(clientRequestDTO);
+                var result = await ClientService.AddClientAsync(clientRequestDTO);
+                return StatusCode(StatusCodes.Status201Created, result);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            return Ok(result);
         }
 
         [HttpPut("{destId:int}")]

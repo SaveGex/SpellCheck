@@ -47,19 +47,18 @@ public class UsersController : ControllerBase
 
     [HttpGet("{userId:int}")]
     [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserResponseDTO>> GetUserById(int userId)
     {
-        UserResponseDTO result;
         try
         {
-            result = await UserService.GetUserByIdAsync(userId);
+            var result = await UserService.GetUserByIdAsync(userId);
+            return Ok(result);
         }
         catch (Exception ex)
         {
-            return Ok(ex.Message);
+            return BadRequest(ex.Message);
         }
-
-        return BadRequest(result);
     }
 
     [HttpPut("{userId:int}")]
@@ -77,16 +76,20 @@ public class UsersController : ControllerBase
 
     [HttpDelete("{userId:int}")]
     [UserOwnership("userId", "Users")]
-    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
-    public async Task<ActionResult<UserResponseDTO>> DeleteUserById(int userId)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteUserById(int userId)
     {
-        Result<UserResponseDTO> result = await UserService.DeleteUserAsync(userId);
-        if (result.IsSuccess)
-        {
-            return Ok();
-        }
 
-        return BadRequest(result.Errors);
+        try
+        {
+            _ = await UserService.DeleteUserAsync(userId);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("{userId:int}/roles/{roleId:int}")]

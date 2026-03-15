@@ -17,7 +17,7 @@ namespace DomainData.Interfaces
         Task<bool> ExistsAsync(string? number, string? email);
 
         Task<KeysetPaginationAfterResult<User>> GetUsersKeysetPaginationAsync(string? after, string? propName, int? limit, int? Id, bool? reverse);
-        Task<User> CreateUserAsync(User user, RoleNames? roleArgument = null);
+        Task<User> CreateUserAsync(User user, params RoleNames[] roleArgument);
         Task<User> GetUserByIdAsync(int userId);
         Task<User> UpdateUserAsync(User user);
         Task<User> DeleteUserAsync(User user);

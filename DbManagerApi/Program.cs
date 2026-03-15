@@ -2,24 +2,23 @@ using Application.Interfaces;
 using Application.Profiles;
 using Application.Profiles.Resolvers;
 using Application.Services;
-using DbManagerApi.Authentication.Handlers;
+using DbManagerApi.Extentions;
 using DbManagerApi.JsonPatchSample;
 using DbManagerApi.Services;
 using DomainData.Roles;
 using Infrastructure.DI;
-using Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
-using System;
 using System.Text;
 
 const string LuckyLicenseKeyWord = "Lucky Penny License Key";
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddControllers(options =>
 {
@@ -30,56 +29,19 @@ builder.Services.AddControllers(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
+builder.Services.AddLogging(logBuilder =>
+{
+    logBuilder.AddConfiguration(builder.Configuration);
+
+    logBuilder.AddFileLogging();
+});
 
 builder.Services.AddAuthentication()
-    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null) // remained for debugging purposes
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.TokenValidationParameters = new()
-        {
-            ValidateIssuer = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["JWT:Issuer"],
-            ValidAudience = builder.Configuration["JWT:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(
-                    builder.Configuration.GetJWTSigningSecretValue()
-            )),
-            ValidateAudience = false // do it later, manually
-        };
+    //.AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null) // remained for debugging purposes
+    .AddJwtBearer();
 
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = async context =>
-            {
-                var db = context.HttpContext.RequestServices
-                    .GetRequiredService<Infrastructure.DB.SpellTestDbContext>();
+builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, JwtBearerOptionsConfigurator>();
 
-                var audiences = await db.Clients
-                    .Select(c => c.URL)
-                    .ToListAsync();
-
-                // fetch all 'aud' claims
-                var jwtAudiences = context.Principal?
-                    .FindAll("aud")
-                    .Select(c => c.Value)
-                    .ToList();
-
-                if (jwtAudiences == null || !jwtAudiences.Any())
-                {
-                    context.Fail("Token has no audience claim.");
-                    return;
-                }
-
-                // check if at least one matches
-                if (!jwtAudiences.Any(aud => audiences.Contains(aud)))
-                {
-                    context.Fail("Token audience not allowed.");
-                }
-            }
-        };
-    });
 builder.Services.AddAuthorization(auth =>
 {
     auth.AddPolicy("Bearer", policy =>
@@ -87,15 +49,10 @@ builder.Services.AddAuthorization(auth =>
         policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
         policy.RequireAuthenticatedUser();
     });
-    auth.AddPolicy("BasicAuthentication", policy =>
-    {
-        policy.AddAuthenticationSchemes("BasicAuthentication");
-        policy.RequireAuthenticatedUser();
-    });
 });
 
 //---add repositories to the DI container ---
-builder.Services.AddInfrastructure();
+builder.AddInfrastructure();
 
 //---add services---
 builder.Services.AddTransient<IEntityOwnershipService, EntityOwnershipService>();
@@ -129,12 +86,18 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.ExecuteMigrations();
+
+await app.RegisterAdminUserAsync();
+await app.RegisterTestClientAsync();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseCors();
 
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
+if(true)
 {
     app.MapOpenApi("/openapi/DbManagerApi.json");
     app.MapScalarApiReference(options =>
@@ -148,7 +111,8 @@ app.UseHttpsRedirection();
 
 app.MapControllers().RequireAuthorization(policy =>
 {
-    policy.AddAuthenticationSchemes("BasicAuthentication", "Bearer");
+    //policy.AddAuthenticationSchemes("BasicAuthentication", "Bearer");
+    policy.AddAuthenticationSchemes("Bearer");
 
     policy.RequireAuthenticatedUser();
     policy.RequireRole(nameof(RoleNames.User), nameof(RoleNames.Manager), nameof(RoleNames.Admin));

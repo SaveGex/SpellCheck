@@ -15,7 +15,6 @@ public partial class Word
     public string Expression { get; set; } = null!;
     [StringLength(maximumLength: 256, ErrorMessage = "Meaning cannot be longer than 256 characters.")]
     public string Meaning { get; set; } = null!;
-
     public int? DifficultyId { get; set; }
     [DataType(DataType.DateTime)]
     public DateTime CreatedAt { get; set; }

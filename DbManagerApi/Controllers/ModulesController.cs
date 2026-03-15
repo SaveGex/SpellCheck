@@ -61,19 +61,19 @@ public class ModulesController : ControllerBase
 
     [HttpPost]
     [BindingAuthorId<ModuleCreateDTO>]
-    [ProducesResponseType(typeof(ModuleResponseDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ModuleResponseDTO), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ModuleResponseDTO>> CreateModule([FromBody] ModuleCreateDTO dto)
     {
-        ModuleResponseDTO result;
         try
         {
-            result = await ModuleService.CreateModuleAsync(dto);
+            var result = await ModuleService.CreateModuleAsync(dto);
+            return CreatedAtAction(nameof(GetModuleById), new { moduleId = result.Id }, result);
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        return Ok(result);
     }
 
 
@@ -97,18 +97,18 @@ public class ModulesController : ControllerBase
 
     [HttpDelete("{moduleId:int}")]
     [UserOwnership("moduleId", "Modules")]
-    [ProducesResponseType(typeof(ModuleResponseDTO), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ModuleResponseDTO>> DeleteModule(int moduleId)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteModule(int moduleId)
     {
-        ModuleResponseDTO result;
         try
         {
-            result = await ModuleService.DeleteModuleAsync(moduleId);
+            await ModuleService.DeleteModuleAsync(moduleId);
+            return NoContent();
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        return Ok(result);
     }
 }

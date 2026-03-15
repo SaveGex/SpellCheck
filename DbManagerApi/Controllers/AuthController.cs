@@ -16,31 +16,28 @@ public class AuthController : ControllerBase
         AuthService = authService;
     }
 
-    [HttpGet]
+    [HttpGet("ping")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IActionResult> Hello()
-    {
-        return Task.FromResult<IActionResult>(Ok());
-    }
+    public IActionResult Hello() => Ok();
 
     [HttpPost("register")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserResponseDTO), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserResponseDTO>> Register(
         string? ipAddress,
         [FromBody] UserRegisterDTO userRegisterDTO)
     {
-        UserResponseDTO userResponseDTO;
         try
         {
-            userResponseDTO = await AuthService.RegisterUserAsync(userRegisterDTO);
+            var result = await AuthService.RegisterUserAsync(userRegisterDTO);
+            return StatusCode(StatusCodes.Status201Created, result);
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        return Ok(userResponseDTO);
     }
 
     [HttpPost("login")]

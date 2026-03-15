@@ -19,46 +19,85 @@ public class RolesController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(RoleResponseDTO), StatusCodes.Status200OK)]
-    public async Task<ActionResult<RoleResponseDTO>> CreateRole(
-        [FromBody] RoleCreateDTO dto)
+    [ProducesResponseType(typeof(RoleResponseDTO), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<RoleResponseDTO>> CreateRole([FromBody] RoleCreateDTO dto)
     {
-        RoleResponseDTO result = await RoleService.CreateRoleAsync(dto);
-        return Ok(result);
+        try
+        {
+            var result = await RoleService.CreateRoleAsync(dto);
+            return CreatedAtAction(nameof(GetRole), new { roleId = result.Id }, result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<RoleResponseDTO>>> GetAllRoles()
     {
-        IEnumerable<RoleResponseDTO> result = await RoleService.GetRolesAsync();
-        return Ok(result);
+        try
+        {
+            IEnumerable<RoleResponseDTO> result = await RoleService.GetRolesAsync();
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpGet("{roleId:int}")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<RoleResponseDTO>>> GetRole(int roleId)
     {
-        RoleResponseDTO result = await RoleService.GetRoleAsync(roleId);
-        return Ok(result);
+        try
+        {
+            RoleResponseDTO result = await RoleService.GetRoleAsync(roleId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
 
     [HttpPut]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<RoleResponseDTO>>> UpdateRole(
         [FromBody] RoleUpdateDTO dto)
     {
-        RoleResponseDTO result = await RoleService.UpdateRoleAsync(dto);
-        return Ok(result);
+        try
+        {
+            RoleResponseDTO result = await RoleService.UpdateRoleAsync(dto);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpDelete("{roleId:int}")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-    public async Task<ActionResult<RoleResponseDTO>> DeleteRole(int roleId)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteRole(int roleId)
     {
-        RoleResponseDTO result = await RoleService.DeleteRoleAsync(roleId);
-        return Ok(result);
+        try
+        {
+            await RoleService.DeleteRoleAsync(roleId);
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
 

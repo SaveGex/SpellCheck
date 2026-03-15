@@ -34,19 +34,19 @@ public class WordsController : ControllerBase
 
     [HttpPost]
     [BindingAuthorId<WordCreateDTO>]
-    [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<WordResponseDTO>> CreateWord([FromBody] WordCreateDTO dto)
     {
-        WordResponseDTO result;
         try
         {
-            result = await WordService.CreateWordAsync(dto);
+            var result = await WordService.CreateWordAsync(dto);
+            return CreatedAtAction(nameof(GetWordById), new { wordId = result.Id }, result);
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        return Ok(result);
     }
 
 
@@ -70,19 +70,19 @@ public class WordsController : ControllerBase
 
     [HttpDelete("{wordId:int}")]
     [UserOwnership("wordId", "Words")]
-    [ProducesResponseType(typeof(WordResponseDTO), StatusCodes.Status200OK)]
-    public async Task<ActionResult<WordResponseDTO>> DeleteWord(int wordId)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteWord(int wordId)
     {
-        WordResponseDTO result;
         try
         {
-            result = await WordService.DeleteWordAsync(wordId);
+            await WordService.DeleteWordAsync(wordId);
+            return NoContent();
         }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
         }
-        return Ok(result);
     }
 
 

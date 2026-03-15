@@ -12,8 +12,6 @@ namespace DbManagerApi.Controllers.Filters.FilterAttributes
     {
         private string authorIdPropertyName { get; init; }
 
-        private TDestination? destinationModel;
-
         public BindingAuthorIdAttribute(string authorIdPropertyName = "AuthorId")
         {
             this.authorIdPropertyName = authorIdPropertyName;

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 namespace Infrastructure.Services;
 
-public class ClientCacheService : IClientCacheService
+internal class ClientCacheService : IClientCacheService
 {
     private const string ClientCacheKeyPrefix = "Client_";
 

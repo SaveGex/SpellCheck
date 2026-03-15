@@ -21,20 +21,19 @@ namespace DbManagerApi.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(FriendResponseDTO), StatusCodes.Status200OK)]
-        public async Task<ActionResult<FriendResponseDTO>> AddFriend(
-            [FromBody] FriendCreateDTO dto)
+        [ProducesResponseType(typeof(FriendResponseDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<FriendResponseDTO>> AddFriend([FromBody] FriendCreateDTO dto)
         {
-            FriendResponseDTO result;
             try
             {
-                result = await FriendsService.AddFriendAsync(dto);
+                var result = await FriendsService.AddFriendAsync(dto);
+                return CreatedAtAction(nameof(GetFriend), new { friendId = result.Id }, result);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            return Ok(result);
         }
 
 
@@ -107,21 +106,20 @@ namespace DbManagerApi.Controllers
 
 
         [HttpDelete("{friendId:int}")]
-        [ProducesResponseType(typeof(FriendResponseDTO), StatusCodes.Status200OK)]
         [UserOwnership("friendId", $"{nameof(Friend)}s")]
-        public async Task<ActionResult<FriendResponseDTO>> DeleteFriend(
-            int friendId)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> DeleteFriend(int friendId)
         {
-            FriendResponseDTO result;
             try
             {
-                result = await FriendsService.DeleteFriendAsync(friendId);
+                await FriendsService.DeleteFriendAsync(friendId);
+                return NoContent();
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            return Ok(result);
         }
 
     }

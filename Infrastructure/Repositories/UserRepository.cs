@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 
 namespace DbManagerApi.Services.UserServices;
 
-public sealed class UserRepository : IUserRepository
+internal sealed class UserRepository : IUserRepository
 {
     private readonly SpellTestDbContext _context;
 
@@ -152,16 +152,13 @@ public sealed class UserRepository : IUserRepository
             result);
     }
 
-    public async Task<User> CreateUserAsync(User user, RoleNames? roleArgument = null)
+    public async Task<User> CreateUserAsync(User user, params RoleNames[] roleArgument)
     {
-        RoleNames role;
-        switch (roleArgument)
-        {
-            case null: role = RoleNames.User; break;
-            case not null: role = roleArgument.Value; break;
-        }
+        roleArgument = roleArgument.Append(RoleNames.User).Distinct().ToArray();
 
-        user = await AttachRoleAsync(user, role);
+        foreach (RoleNames role in roleArgument)
+            user = await AttachRoleAsync(user, role);
+
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();

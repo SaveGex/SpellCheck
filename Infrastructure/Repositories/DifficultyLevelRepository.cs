@@ -4,7 +4,7 @@ using Infrastructure.DB;
 
 namespace Infrastructure.Repositories;
 
-public class DifficultyLevelRepository : IDifficultyLevelRepository
+internal class DifficultyLevelRepository : IDifficultyLevelRepository
 {
 
     public SpellTestDbContext Context { get; init; }

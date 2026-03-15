@@ -39,6 +39,7 @@ public partial class SpellTestDbContext : DbContext
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         var configuration = configurationBuilder
             .AddUserSecrets<SpellTestDbContext>()
+            .AddEnvironmentVariables()
             .Build();
         optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection")); // from 'dotnet user-secrets'
     }
@@ -227,6 +228,9 @@ public partial class SpellTestDbContext : DbContext
             entity.Property(e => e.Id)
                 .HasColumnName("Id")
                 .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.ClientId).IsRequired();
+            entity.HasIndex(e => e.ClientId).IsUnique();
 
             entity.Property(e => e.Name)
                 .IsRequired()

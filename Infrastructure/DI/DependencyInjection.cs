@@ -4,45 +4,54 @@ using DbManagerApi.Services.UserServices;
 using DbManagerApi.Services.WordServices;
 using DomainData.Interfaces;
 using DomainData.Models;
+using Infrastructure.Configuration;
 using Infrastructure.DB;
 using Infrastructure.DB.Interceptors;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.DI;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services)
+    public static WebApplicationBuilder AddInfrastructure(
+        this WebApplicationBuilder builder)
     {
         // DbContext
-        services.AddSingleton<SoftDeleteInterceptor>();
+        builder.Services.AddSingleton<SoftDeleteInterceptor>();
 
-        services.AddDbContext<SpellTestDbContext>((sp, options) =>
+        builder.Services.AddDbContext<SpellTestDbContext>((sp, options) =>
             options.AddInterceptors()
                 .AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>())
         );
 
         // Repositories
-        services.AddTransient<IModuleRepository, ModuleRepository>();
-        services.AddTransient<IWordRepository, WordRepository>();
-        services.AddTransient<IUserRepository, UserRepository>();
-        services.AddTransient<IModelRepository, ModelRepository>();
-        services.AddTransient<IRoleRepository, RoleRepository>();
-        services.AddTransient<IDifficultyLevelRepository, DifficultyLevelRepository>();
-        services.AddTransient<IFriendsRepository, FriendsRepository>();
-        services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
-        services.AddTransient<IClientRepository, ClientRepository>();
+        builder.Services.AddTransient<IModuleRepository, ModuleRepository>();
+        builder.Services.AddTransient<IWordRepository, WordRepository>();
+        builder.Services.AddTransient<IUserRepository, UserRepository>();
+        builder.Services.AddTransient<IModelRepository, ModelRepository>();
+        builder.Services.AddTransient<IRoleRepository, RoleRepository>();
+        builder.Services.AddTransient<IDifficultyLevelRepository, DifficultyLevelRepository>();
+        builder.Services.AddTransient<IFriendsRepository, FriendsRepository>();
+        builder.Services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
+        builder.Services.AddTransient<IClientRepository, ClientRepository>();
 
         // Other
-        services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
+        builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
+        builder.Services.AddSingleton(sp =>
+        {
+            var options = new JwtConfigOptions();
+            builder.Configuration.GetSection("JWT").Bind(options);
+            return options;
+        });
 
-        // Services
-        services.AddSingleton<IClientCacheService, ClientCacheService>();
-        services.AddTransient<ITokenService, TokenService>();
-        return services;
+        // builder.Services
+        builder.Services.AddSingleton<IClientCacheService, ClientCacheService>();
+        builder.Services.AddTransient<ITokenService, TokenService>();
+        return builder;
     }
 }

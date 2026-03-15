@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DbManagerApi.Services.WordServices;
 
 
-public class WordRepository : IWordRepository
+internal class WordRepository : IWordRepository
 {
     private readonly SpellTestDbContext _context;
     private readonly IMapper _mapper;
