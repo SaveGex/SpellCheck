@@ -16,19 +16,16 @@ jobs:
 
     - name: Create .env file
       run: |
-        cat > .env << EOF
-        MSSQL_SA_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
-        MSSQL_DATABASE=${{ secrets.MSSQL_DATABASE }}
-        MSSQL_USER=${{ secrets.MSSQL_USER }}
-        MSSQL_USER_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
-        JWT__SecretKey=${{ secrets.JWT__SecretKey }}
-        APIAdministrator__Email=${{ secrets.API_ADMIN_EMAIL }}
-        APIAdministrator__Password=${{ secrets.API_ADMIN_PASSWORD }}
-        APIAdministrator__Client__Id=${{ secrets.API_CLIENT_ID }}
-        APIAdministrator__Client__Name=${{ secrets.APIAdministrator__Client__Name}}
-        APIAdministrator__Client__URL=${{ secrets.APIAdministrator__Client__URL }}
-        CONNECTIONSTRINGS__DEFAULTCONNECTION=${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}
-        EOF
+        echo "MSSQL_SA_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}" >> .env
+        echo "MSSQL_DATABASE=${{ secrets.MSSQL_DATABASE }}" >> .env
+        echo "MSSQL_USER=${{ secrets.MSSQL_USER }}" >> .env
+        echo "MSSQL_USER_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}" >> .env
+        echo "JWT__SecretKey=${{ secrets.JWT__SecretKey }}" >> .env
+        echo "APIAdministrator__Email=${{ secrets.APIAdministrator__Email }}" >> .env
+        echo "APIAdministrator__Password=${{ secrets.APIAdministrator__Password }}" >> .env
+        echo "APIAdministrator__Client__Id=${{ secrets.APIAdministrator__Client__Id }}" >> .env
+        echo "APIAdministrator__Client__Name=${{ secrets.APIAdministrator__Client__Name }}" >> .env
+        echo "APIAdministrator__Client__URL=${{ secrets.APIAdministrator__Client__URL }}" >> .env
 
     - name: Generate connection string
       run: |
