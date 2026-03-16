@@ -1,7 +1,7 @@
 ﻿
-using Infrastructure.Configuration;
-using Infrastructure.Logging.Providers;
 
+
+using System.Configuration;
 
 namespace DbManagerApi.Extentions
 {
@@ -9,13 +9,20 @@ namespace DbManagerApi.Extentions
     {
         extension(ILoggingBuilder loggingBuilder)
         {
-            public ILoggingBuilder AddFileLogging()
+            public ILoggingBuilder AddFileLogging(IConfiguration configuration)
             {
-                loggingBuilder.Services.AddOptions<FileLoggerOptions>()
+                var isActive = configuration
+                    .GetSection("Logging:FileLogger")
+                    .GetValue<bool>("IsActive");
+
+                if (!isActive)
+                    return loggingBuilder;
+
+                loggingBuilder.Services
+                    .AddOptions<Infrastructure.Configuration.FileLoggerOptions>()
                     .BindConfiguration("Logging:FileLogger");
-
-                loggingBuilder.Services.AddSingleton<ILoggerProvider, FileLoggingProvider>();
-
+                loggingBuilder.Services
+                    .AddSingleton<ILoggerProvider, Infrastructure.Logging.Providers.FileLoggingProvider>();
                 return loggingBuilder;
             }
         }

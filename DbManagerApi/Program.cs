@@ -32,8 +32,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddLogging(logBuilder =>
 {
     logBuilder.AddConfiguration(builder.Configuration);
-
-    logBuilder.AddFileLogging();
+    
+    logBuilder.AddFileLogging(builder.Configuration);
 });
 
 builder.Services.AddAuthentication()

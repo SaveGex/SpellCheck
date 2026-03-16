@@ -7,6 +7,7 @@ namespace Infrastructure.Configuration
 {
     public class FileLoggerOptions
     {
+        public bool IsActive { get; init; }
         public LogLevel MinimalLoggingLevel { get; init; } = LogLevel.Information;
         public string LogFileDirectory
         {
