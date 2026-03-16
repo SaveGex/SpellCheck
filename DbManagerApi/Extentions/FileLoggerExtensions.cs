@@ -1,26 +1,28 @@
 ﻿
 
 
+using System.Configuration;
+
 namespace DbManagerApi.Extentions
 {
     public static class FileLoggerExtensions
     {
         extension(ILoggingBuilder loggingBuilder)
         {
-            public ILoggingBuilder AddFileLogging()
+            public ILoggingBuilder AddFileLogging(IConfiguration configuration)
             {
-                var options = loggingBuilder.Services
-                        .BuildServiceProvider()
-                        .GetRequiredService<IConfiguration>()
-                        .GetSection("Logging:FileLogger")
-                        .Get<Infrastructure.Configuration.FileLoggerOptions>();
+                var isActive = configuration
+                    .GetSection("Logging:FileLogger")
+                    .GetValue<bool>("IsActive");
 
-                if (options?.IsActive != true)
+                if (!isActive)
                     return loggingBuilder;
 
-                loggingBuilder.Services.AddOptions<Infrastructure.Configuration.FileLoggerOptions>()
+                loggingBuilder.Services
+                    .AddOptions<Infrastructure.Configuration.FileLoggerOptions>()
                     .BindConfiguration("Logging:FileLogger");
-                loggingBuilder.Services.AddSingleton<ILoggerProvider, Infrastructure.Logging.Providers.FileLoggingProvider>();
+                loggingBuilder.Services
+                    .AddSingleton<ILoggerProvider, Infrastructure.Logging.Providers.FileLoggingProvider>();
                 return loggingBuilder;
             }
         }
