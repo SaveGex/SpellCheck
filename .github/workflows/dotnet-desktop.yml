@@ -2,7 +2,7 @@ name: .NET API CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "ci/fix-workflow" ]
   pull_request:
     branches: [ "master" ]
 
@@ -10,76 +10,87 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      mssql:
-        image: mcr.microsoft.com/mssql/server:2019-latest
-        env:
-          SA_PASSWORD: ${{ secrets.MSSQL_SA_PASSWORD }}
-          ACCEPT_EULA: Y
-        ports:
-          - 1433:1433
-        options: >-
-          --health-cmd "exit 0"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-
-    env:
-      Solution_Name: SpellCheck.sln
-      ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=TestDb;User Id=sa;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
-
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Setup .NET 9 SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
-
-    - name: Install MSSQL tools
+    - name: Create .env file
       run: |
-        sudo ACCEPT_EULA=Y apt-get install -y curl apt-transport-https gnupg
-        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-        curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
-        sudo apt-get update
-        sudo ACCEPT_EULA=Y apt-get install -y mssql-tools18 unixodbc-dev
-        echo "/opt/mssql-tools18/bin" >> $GITHUB_PATH
+        cat > .env << EOF
+        MSSQL_SA_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
+        MSSQL_DATABASE=${{ secrets.MSSQL_DATABASE }}
+        MSSQL_USER=${{ secrets.MSSQL_USER }}
+        MSSQL_USER_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
+        JWT__SecretKey=${{ secrets.JWT__SecretKey }}
+        APIAdministrator__Email=${{ secrets.API_ADMIN_EMAIL }}
+        APIAdministrator__Password=${{ secrets.API_ADMIN_PASSWORD }}
+        APIAdministrator__Client__Id=${{ secrets.API_CLIENT_ID }}
+        APIAdministrator__Client__Name=${{ secrets.APIAdministrator__Client__Name}}
+        APIAdministrator__Client__URL=${{ secrets.APIAdministrator__Client__URL }}
+        CONNECTIONSTRINGS__DEFAULTCONNECTION=${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}
+        EOF
 
-    - name: Wait for SQL Server
+    - name: Generate connection string
+      run: |
+        source .env
+        CONN="Server=localhost,1433;Database=${MSSQL_DATABASE};User Id=${MSSQL_USER};Password=${MSSQL_USER_PASSWORD};TrustServerCertificate=True"
+        echo "CONNECTIONSTRINGS__DEFAULTCONNECTION=${CONN}" >> .env
+        echo "ConnectionStrings__DefaultConnection=${CONN}" >> $GITHUB_ENV
+
+    - name: Override docker-compose for CI
+      run: |
+        cat > docker-compose.override.yml << EOF
+        services:
+          dbmanagerapi:
+            volumes: []
+            environment:
+              Logging__FileLogger__IsActive: "false"
+        EOF
+
+    - name: Start services
+      run: docker compose up -d --build
+
+    - name: Wait for SQL Server healthy
       run: |
         for i in {1..30}; do
-          sqlcmd -C -S localhost -U sa -P "${{ secrets.MSSQL_SA_PASSWORD }}" -Q "SELECT 1" && break
-          echo "Waiting for SQL Server..."
-          sleep 2
+          STATUS=$(docker inspect --format='{{.State.Health.Status}}' sql2025 2>/dev/null)
+          [ "$STATUS" = "healthy" ] && echo "SQL Server ready!" && break
+          echo "Attempt $i — status: $STATUS"
+          sleep 3
         done
 
+    - name: Wait for API healthy
+      run: |
+        for i in {1..20}; do
+          curl -sf http://localhost:8080/health && break
+          echo "Waiting for API..."
+          sleep 3
+        done
+
+    - name: Setup .NET 10 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.x.x
+
     - name: Restore
-      run: dotnet restore $Solution_Name
+      run: dotnet restore SpellCheck.sln
 
     - name: Build
-      run: dotnet build $Solution_Name --configuration Release --no-restore
-
-    - name: Install EF Core tools
-      run: dotnet tool install --global dotnet-ef
-
-    - name: Add .NET tools to PATH
-      run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-
-    - name: Apply EF Core migrations
-      run: |
-        cd DbManagerApi
-        dotnet ef database update \
-          --startup-project . \
-          --connection "Server=localhost,1433;Database=TestDb;User Id=sa;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
-
-
+      run: dotnet build SpellCheck.sln --configuration Release --no-restore
 
     - name: Run tests
-      run: dotnet test $Solution_Name --configuration Release --no-build --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
+      run: dotnet test SpellCheck.sln --configuration Release --no-build --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
+      env:
+        ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=TestDb;User Id=testuser;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
+        Logging__FileLogger__IsActive: "false"
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: test-results
         path: ./TestResults
+
+    - name: Tear down
+      if: always()
+      run: docker compose down -v
