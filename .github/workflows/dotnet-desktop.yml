@@ -1,4 +1,4 @@
-name: .NET API CI
+name: .NET API CI\CD
 
 on:
   push:
@@ -7,43 +7,86 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - name: Create build directory
+      run: mkdir build
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: src
+
+    - name: Create .env file
+      run: touch .env
+      working-directory: build
+
+    - name: Write .env variables
+      run: | 
+        cat <<ENVIRONMENTS >> .env
+        MSSQL_SA_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
+        MSSQL_DATABASE=${{ secrets.MSSQL_DATABASE }}
+        MSSQL_USER=${{ secrets.MSSQL_USER }}
+        MSSQL_USER_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
+        JWT__SecretKey=${{ secrets.JWT__SecretKey }}
+        APIAdministrator__Email=${{ secrets.APIAdministrator__Email }}
+        APIAdministrator__Password=${{ secrets.APIAdministrator__Password }}
+        APIAdministrator__Client__Id=${{ secrets.APIAdministrator__Client__Id }}
+        APIAdministrator__Client__Name=${{ secrets.APIAdministrator__Client__Name }}
+        APIAdministrator__Client__URL=${{ secrets.APIAdministrator__Client__URL }}
+        ENVIRONMENTS
+      working-directory: build
+
+    - name: Generate connection string
+      run: |
+        CONN="Server=localhost,1433;Database=${MSSQL_DATABASE};User Id=${MSSQL_USER};Password=${MSSQL_USER_PASSWORD};TrustServerCertificate=True"
+        echo "CONNECTIONSTRINGS__DEFAULTCONNECTION=${CONN}" >> .env
+        echo "ConnectionStrings__DefaultConnection=${CONN}" >> $GITHUB_ENV
+      working-directory: build
+
+    - name: Setup .NET 10 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.x.x
+
+    - name: Restore
+      run: dotnet restore SpellCheck.sln
+      working-directory: src
+
+    - name: Build
+      run: dotnet build SpellCheck.sln --configuration Release --no-restore -o ../build
+      working-directory: src
+    
+    - name: Upload build
+      uses: actions/upload-artifact@v4
+      with:
+        name: publish
+        path: build
+    
+  docker-compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: ["build"] # for configured env file
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        path: src
+    
+    - name: Download build
+      uses: actions/download-artifact@v4
+      with:
+        name: publish
+        path: build
 
-    - name: Create .env file
+    - name: Import .env from build
       run: |
-        echo "MSSQL_SA_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}" >> .env
-        echo "MSSQL_DATABASE=${{ secrets.MSSQL_DATABASE }}" >> .env
-        echo "MSSQL_USER=${{ secrets.MSSQL_USER }}" >> .env
-        echo "MSSQL_USER_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}" >> .env
-        echo "JWT__SecretKey=${{ secrets.JWT__SecretKey }}" >> .env
-        echo "APIAdministrator__Email=${{ secrets.APIAdministrator__Email }}" >> .env
-        echo "APIAdministrator__Password=${{ secrets.APIAdministrator__Password }}" >> .env
-        echo "APIAdministrator__Client__Id=${{ secrets.APIAdministrator__Client__Id }}" >> .env
-        echo "APIAdministrator__Client__Name=${{ secrets.APIAdministrator__Client__Name }}" >> .env
-        echo "APIAdministrator__Client__URL=${{ secrets.APIAdministrator__Client__URL }}" >> .env
-
-    - name: Generate connection string
-      run: |
-        source .env
-        CONN="Server=localhost,1433;Database=${MSSQL_DATABASE};User Id=${MSSQL_USER};Password=${MSSQL_USER_PASSWORD};TrustServerCertificate=True"
-        echo "CONNECTIONSTRINGS__DEFAULTCONNECTION=${CONN}" >> .env
-        echo "ConnectionStrings__DefaultConnection=${CONN}" >> $GITHUB_ENV
-
-    - name: Override docker-compose for CI
-      run: |
-        cat > docker-compose.override.yml << EOF
-        services:
-          dbmanagerapi:
-            volumes: []
-            environment:
-              Logging__FileLogger__IsActive: "false"
-        EOF
-
+        source ./build/.env
+    
     - name: Start services
       run: docker compose up -d --build
 
@@ -63,23 +106,27 @@ jobs:
           echo "Waiting for API..."
           sleep 3
         done
+    
+    - name: Tear down
+      if: always()
+      run: docker compose down -v
 
-    - name: Setup .NET 10 SDK
-      uses: actions/setup-dotnet@v4
+  tests:
+    runs-on: ubuntu-latest
+    needs: ["build"]
+
+    steps:
+
+    - name: Download build
+      uses: actions/download-artifact@v4
       with:
-        dotnet-version: 10.x.x
-
-    - name: Restore
-      run: dotnet restore SpellCheck.sln
-
-    - name: Build
-      run: dotnet build SpellCheck.sln --configuration Release --no-restore
+        name: publish
+        path: build
 
     - name: Run tests
-      run: dotnet test SpellCheck.sln --configuration Release --no-build --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
+      run: dotnet test Tests.csproj --configuration Release --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
       env:
         ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=TestDb;User Id=testuser;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
-        Logging__FileLogger__IsActive: "false"
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
@@ -87,7 +134,25 @@ jobs:
       with:
         name: test-results
         path: ./TestResults
+      
+  deploy:
+    runs-on: ubuntu-latest
+    needs: ["build", "tests"]
 
-    - name: Tear down
-      if: always()
-      run: docker compose down -v
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to ghcr.io container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./DbManagerApi/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest
