@@ -73,9 +73,10 @@ jobs:
         path: build
 
     - name: Copy .env from build to docker-compose file
-      run: |
-        cp ../build/config/.env ./.env
-      working-directory: src
+      uses: ./src/.github/actions/setup-env
+      with:
+        secrets_json: ${{ toJson(secrets) }}
+        env_path: ./src/.env
     
     - name: Start services
       run: docker compose up -d --build
