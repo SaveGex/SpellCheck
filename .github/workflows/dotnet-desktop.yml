@@ -83,12 +83,14 @@ jobs:
         name: publish
         path: build
 
-    - name: Import .env from build
+    - name: Copy .env from build to docker-compose file
       run: |
-        source ./build/.env
+        cp ../build/.env ./.env
+      working-directory: src
     
     - name: Start services
       run: docker compose up -d --build
+      working-directory: src
 
     - name: Wait for SQL Server healthy
       run: |
@@ -110,6 +112,7 @@ jobs:
     - name: Tear down
       if: always()
       run: docker compose down -v
+      working-directory: src
 
   tests:
     runs-on: ubuntu-latest
@@ -121,10 +124,9 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: publish
-        path: build
 
     - name: Run tests
-      run: dotnet test Tests.csproj --configuration Release --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
+      run: dotnet test *.Tests.dll --no-build --configuration Release --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
       env:
         ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=TestDb;User Id=testuser;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
 
