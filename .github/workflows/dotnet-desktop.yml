@@ -24,6 +24,23 @@ jobs:
       run: touch .env
       working-directory: build
 
+    - name: Setup .NET 10 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.x.x
+
+    - name: Restore
+      run: dotnet restore SpellCheck.sln
+      working-directory: src
+
+    - name: Build Solution
+      run: dotnet build SpellCheck.sln --configuration Release --no-restore -o ../build
+      working-directory: src
+
+    - name: Build Tests project
+      run: dotnet publish Tests/Tests.csproj --configuration Release --no-restore -o ../build
+      working-directory: src
+      
     - name: Write .env variables
       run: | 
         cat <<ENVIRONMENTS >> .env
@@ -47,19 +64,6 @@ jobs:
         echo "ConnectionStrings__DefaultConnection=${CONN}" >> $GITHUB_ENV
       working-directory: build
 
-    - name: Setup .NET 10 SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 10.x.x
-
-    - name: Restore
-      run: dotnet restore SpellCheck.sln
-      working-directory: src
-
-    - name: Build
-      run: dotnet build SpellCheck.sln --configuration Release --no-restore -o ../build
-      working-directory: src
-    
     - name: Upload build
       uses: actions/upload-artifact@v4
       with:
@@ -124,9 +128,10 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: publish
+        path: build
 
     - name: Run tests
-      run: dotnet test *.Tests.dll --no-build --configuration Release --logger "trx;LogFileName=test_results.trx" --results-directory ./TestResults
+      run: dotnet test ./build/Tests.dll --logger "trx;LogFileName=test_results.trx" --results-directory ../TestResults
       env:
         ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=TestDb;User Id=testuser;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
 
