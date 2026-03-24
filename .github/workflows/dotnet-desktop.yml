@@ -20,10 +20,6 @@ jobs:
       with:
         path: src
 
-    - name: Create .env file
-      run: touch .env
-      working-directory: build
-
     - name: Setup .NET 10 SDK
       uses: actions/setup-dotnet@v4
       with:
@@ -40,7 +36,11 @@ jobs:
     - name: Build Tests project
       run: dotnet publish Tests/Tests.csproj --configuration Release --no-restore -o ../build
       working-directory: src
-      
+    
+    - name: Create .env file
+      run: touch .env
+      working-directory: build
+    
     - name: Write .env variables
       run: | 
         cat <<ENVIRONMENTS >> .env
@@ -144,7 +144,7 @@ jobs:
       
   deploy:
     runs-on: ubuntu-latest
-    needs: ["build", "tests"]
+    needs: ["build", "tests", "docker-compose"]
 
     steps:
       - uses: actions/checkout@v4
