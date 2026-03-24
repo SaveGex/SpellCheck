@@ -43,16 +43,11 @@ jobs:
     - name: Copy Tests to build directory
       run: rsync -a /tmp/build/tests/ ./build/tests/
 
-    - name: Create config directory
-      run: mkdir build/config
-
-    - name: Create .env file
-      run: touch .env
-      working-directory: build/config
-    
-    - name: Write .env variables
-      run: | 
-        cat <<-ENVIRONMENTS > .env
+    - name: Create config and .env
+      run: |
+        mkdir -p $GITHUB_WORKSPACE/build/config
+        
+        cat <<-ENVIRONMENTS > $GITHUB_WORKSPACE/build/config/.env
         MSSQL_SA_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
         MSSQL_DATABASE=${{ secrets.MSSQL_DATABASE }}
         MSSQL_USER=${{ secrets.MSSQL_USER }}
@@ -63,12 +58,11 @@ jobs:
         APIAdministrator__Client__Id=${{ secrets.APIAdministrator__Client__Id }}
         APIAdministrator__Client__Name=${{ secrets.APIAdministrator__Client__Name }}
         APIAdministrator__Client__URL=${{ secrets.APIAdministrator__Client__URL }}
+        CONNECTIONSTRINGS__DEFAULTCONNECTION="Server=localhost,1433;Database=${{ secrets.MSSQL_DATABASE }};User Id=${{ secrets.MSSQL_USER }};Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
         ENVIRONMENTS
 
-        # Write connection string
-        CONN="Server=localhost,1433;Database=${{ secrets.MSSQL_DATABASE }};User Id=${{ secrets.MSSQL_USER }};Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
-        echo "CONNECTIONSTRINGS__DEFAULTCONNECTION=${CONN}" >> .env
-      working-directory: build/config
+        echo "Checking if .env exists in build/config:"
+        ls -la $GITHUB_WORKSPACE/build/config/
 
     - name: Upload build
       uses: actions/upload-artifact@v4
