@@ -44,7 +44,7 @@ jobs:
       run: rsync -a /tmp/build/tests/ ./build/tests/
 
     - name: Call setup-env action
-      uses: ./.github/actions/setup-env
+      uses: ./src/.github/actions/setup-env
       with:
         secrets_json: ${{ toJson(secrets) }}
         env_path: build/config/.env
