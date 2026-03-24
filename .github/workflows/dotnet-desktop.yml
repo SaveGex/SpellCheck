@@ -43,26 +43,11 @@ jobs:
     - name: Copy Tests to build directory
       run: rsync -a /tmp/build/tests/ ./build/tests/
 
-    - name: Create config and .env
-      run: |
-        mkdir -p $GITHUB_WORKSPACE/build/config
-        
-        cat <<-ENVIRONMENTS > $GITHUB_WORKSPACE/build/config/.env
-        MSSQL_SA_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
-        MSSQL_DATABASE=${{ secrets.MSSQL_DATABASE }}
-        MSSQL_USER=${{ secrets.MSSQL_USER }}
-        MSSQL_USER_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
-        JWT__SecretKey=${{ secrets.JWT__SecretKey }}
-        APIAdministrator__Email=${{ secrets.APIAdministrator__Email }}
-        APIAdministrator__Password=${{ secrets.APIAdministrator__Password }}
-        APIAdministrator__Client__Id=${{ secrets.APIAdministrator__Client__Id }}
-        APIAdministrator__Client__Name=${{ secrets.APIAdministrator__Client__Name }}
-        APIAdministrator__Client__URL=${{ secrets.APIAdministrator__Client__URL }}
-        CONNECTIONSTRINGS__DEFAULTCONNECTION="Server=localhost,1433;Database=${{ secrets.MSSQL_DATABASE }};User Id=${{ secrets.MSSQL_USER }};Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
-        ENVIRONMENTS
-
-        echo "Checking if .env exists in build/config:"
-        ls -la $GITHUB_WORKSPACE/build/config/
+    - name: Call setup-env action
+      uses: ./.github/actions/setup-env
+      with:
+        secrets_json: ${{ toJson(secrets) }}
+        env_path: build/config/.env
 
     - name: Upload build
       uses: actions/upload-artifact@v4

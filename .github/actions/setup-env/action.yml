@@ -1,0 +1,19 @@
+name: 'Setup Local Environment'
+description: 'Creates .env file from secrets for the current VM'
+
+inputs:
+  secrets_json:
+    description: 'The secrets to use'
+    required: true
+  env_path:
+    description: 'The path to the .env file'
+    required: false
+    default: '.env'
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        echo "::add-mask::${{ inputs.secrets_json }}"
+        echo "${{ inputs.secrets_json }}" | jq -r 'to_entries[] | "\(.key)=\(.value)"' > ${{ inputs.env_path }}
