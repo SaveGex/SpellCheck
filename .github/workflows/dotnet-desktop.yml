@@ -72,7 +72,7 @@ jobs:
         name: publish
         path: build
 
-    - name: Copy .env from build to docker-compose file
+    - name: Create .env depends on secrets
       uses: ./src/.github/actions/setup-env
       with:
         secrets_json: ${{ toJson(secrets) }}
@@ -141,6 +141,9 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Convert repository name to lowercase
+        run: echo 'REPOSITORY_LOWERCASE=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')' >> $GITHUB_ENV
 
       - name: Build and Push docker image
         uses: docker/build-push-action@v5
@@ -148,4 +151,4 @@ jobs:
           context: .
           file: ./DbManagerApi/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: ghcr.io/${{ env.REPOSITORY_LOWERCASE }}:latest
