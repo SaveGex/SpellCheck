@@ -43,6 +43,9 @@ jobs:
     - name: Copy Tests to build directory
       run: rsync -a /tmp/build/tests/ ./build/tests/
 
+    - name: Create config directory
+      run: mkdir build/config
+
     - name: Create .env file
       run: touch .env
       working-directory: build/config
