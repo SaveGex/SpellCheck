@@ -30,20 +30,26 @@ jobs:
       working-directory: src
 
     - name: Build Solution
-      run: dotnet build SpellCheck.sln --configuration Release --no-restore -o ../build
+      run: dotnet build SpellCheck.sln --configuration Release --no-restore -o /tmp/build/solution
       working-directory: src
 
     - name: Build Tests project
-      run: dotnet publish Tests/Tests.csproj --configuration Release --no-restore -o ../build
+      run: dotnet publish Tests/Tests.csproj --configuration Release --no-restore -o /tmp/build/tests
       working-directory: src
     
+    - name: Copy Solution to build/solution directory
+      run: rsync -a /tmp/build/solution/ ./build/solution/
+
+    - name: Copy Tests to build directory
+      run: rsync -a /tmp/build/tests/ ./build/tests/
+
     - name: Create .env file
       run: touch .env
-      working-directory: build
+      working-directory: build/config
     
     - name: Write .env variables
       run: | 
-        cat <<ENVIRONMENTS >> .env
+        cat <<-ENVIRONMENTS > .env
         MSSQL_SA_PASSWORD=${{ secrets.MSSQL_SA_PASSWORD }}
         MSSQL_DATABASE=${{ secrets.MSSQL_DATABASE }}
         MSSQL_USER=${{ secrets.MSSQL_USER }}
@@ -55,14 +61,11 @@ jobs:
         APIAdministrator__Client__Name=${{ secrets.APIAdministrator__Client__Name }}
         APIAdministrator__Client__URL=${{ secrets.APIAdministrator__Client__URL }}
         ENVIRONMENTS
-      working-directory: build
 
-    - name: Generate connection string
-      run: |
-        CONN="Server=localhost,1433;Database=${MSSQL_DATABASE};User Id=${MSSQL_USER};Password=${MSSQL_USER_PASSWORD};TrustServerCertificate=True"
+        # Write connection string
+        CONN="Server=localhost,1433;Database=${{ secrets.MSSQL_DATABASE }};User Id=${{ secrets.MSSQL_USER }};Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
         echo "CONNECTIONSTRINGS__DEFAULTCONNECTION=${CONN}" >> .env
-        echo "ConnectionStrings__DefaultConnection=${CONN}" >> $GITHUB_ENV
-      working-directory: build
+      working-directory: build/config
 
     - name: Upload build
       uses: actions/upload-artifact@v4
@@ -89,7 +92,7 @@ jobs:
 
     - name: Copy .env from build to docker-compose file
       run: |
-        cp ../build/.env ./.env
+        cp ../build/config/.env ./.env
       working-directory: src
     
     - name: Start services
@@ -131,7 +134,7 @@ jobs:
         path: build
 
     - name: Run tests
-      run: dotnet test ./build/Tests.dll --logger "trx;LogFileName=test_results.trx" --results-directory ../TestResults
+      run: dotnet test ./build/tests/Tests.dll --logger "trx;LogFileName=test_results.trx" --results-directory ../TestResults
       env:
         ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=TestDb;User Id=testuser;Password=${{ secrets.MSSQL_SA_PASSWORD }};TrustServerCertificate=True"
 
