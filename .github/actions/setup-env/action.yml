@@ -15,7 +15,6 @@ runs:
   steps:
     - shell: bash
       run: |
-        echo "::add-mask::${{ inputs.secrets_json }}"
-
+        mkdir -p "$(dirname "${{ inputs.env_path }}")"
 
         printf '%s' '${{ inputs.secrets_json }}' | jq -r 'to_entries[] | "\(.key)=\(.value)"' > "${{ inputs.env_path }}"
