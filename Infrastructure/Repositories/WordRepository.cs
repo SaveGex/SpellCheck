@@ -84,7 +84,7 @@ internal class WordRepository : IWordRepository
     }
     public async Task<Word> DeleteWordAsync(Word word)
     {
-        _context.Words.Add(word);
+        _context.Words.Remove(word);
         await _context.SaveChangesAsync();
 
         return word;

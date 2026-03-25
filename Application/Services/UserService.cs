@@ -31,7 +31,7 @@ public class UserService : IUserService
 
     public async Task<UserResponseDTO> RemoveRoleFromUserAsync(int userId, int roleId)
     {
-        User result = await UserRepository.AttachRoleToUserAsync(userId, roleId);
+        User result = await UserRepository.RemoveRoleFromUserAsync(userId, roleId);
         return Mapper.Map<UserResponseDTO>(result);
     }
 
