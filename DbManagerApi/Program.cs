@@ -51,6 +51,8 @@ builder.Services.AddAuthorization(auth =>
     });
 });
 
+builder.Services.AddHealthChecks();
+
 //---add repositories to the DI container ---
 builder.AddInfrastructure();
 
@@ -108,6 +110,8 @@ if(true)
 }
 
 app.UseHttpsRedirection();
+
+app.MapHealthChecks("/health");
 
 app.MapControllers().RequireAuthorization(policy =>
 {
