@@ -49,7 +49,7 @@ docker compose up --build
 ```cmd
 git clone https://github.com/SaveGex/SpellCheck
 cd SpellCheck
-copy .env.example .env   # fill in secrets
+copy .env.example .env
 docker compose up --build
 ```
 API will be available at `http://localhost:8080` 
